@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation';
 import { ReactNode, Suspense } from 'react';
 import { AppSidebar } from './app-sidebar';
 import { DashboardHeader } from '@/components/Layout/DashboardHeader';
+import Footer from '@/components/Footer';
 
 async function ChildrenWrapper({ children }: { children: ReactNode }) {
   const isLoggedIn = await getCachedIsUserLoggedIn();
@@ -28,11 +29,14 @@ export default async function Layout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="flex flex-col min-h-screen">
         <DashboardHeader heading={heading} />
+        <div className="flex-1">
         <Suspense fallback={null}>
           <ChildrenWrapper>{children}</ChildrenWrapper>
         </Suspense>
+        </div>
+        <Footer />
       </SidebarInset>
     </SidebarProvider>
   );

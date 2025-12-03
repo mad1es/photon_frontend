@@ -34,17 +34,18 @@ export function DashboardHeader({ heading }: DashboardHeaderProps) {
   };
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border/50 px-4 bg-card/30 backdrop-blur-xl">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 h-4" />
       <div className="flex-1">{heading}</div>
       <div className="flex items-center gap-4">
-        {mounted && <div className="text-sm font-medium">{formatTime(currentTime)}</div>}
+        {mounted && <div className="text-sm font-medium text-foreground/80">{formatTime(currentTime)}</div>}
         {mounted && (
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="hover:bg-accent/50"
           >
             {theme === 'dark' ? (
               <Sun className="h-4 w-4" />

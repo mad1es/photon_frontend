@@ -14,7 +14,7 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <footer className="bg-muted/50 py-8 sm:py-12">
+    <footer className="bg-card/30 border-t border-border/50 py-8 sm:py-12 backdrop-blur-xl">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 pb-12 md:pb-16">
           <div className="space-y-4">

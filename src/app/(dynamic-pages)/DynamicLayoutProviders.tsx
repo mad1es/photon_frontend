@@ -27,15 +27,15 @@ export function DynamicLayoutProviders({
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="light"
-      enableSystem
+      defaultTheme="dark"
+      enableSystem={false}
       disableTransitionOnChange
     >
       {children}
       <Suspense>
         <ProgressBar
           height="4px"
-          color="#0047ab"
+          color="#0038ff"
           options={{ showSpinner: false }}
           shallowRouting
         />
