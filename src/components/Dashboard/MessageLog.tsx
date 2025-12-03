@@ -1,0 +1,110 @@
+'use client';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import type { Message } from '@/types/trading';
+import { useEffect, useRef } from 'react';
+
+interface MessageLogProps {
+  messages: Message[];
+}
+
+function MessageItem({ message }: { message: Message }) {
+  const getMessageTypeColor = (type: string) => {
+    switch (type) {
+      case 'MARKET_SNAPSHOT':
+        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+      case 'TRADE_DECISION':
+        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400';
+      case 'EXECUTION_REPORT':
+        return 'bg-green-500/10 text-green-600 dark:text-green-400';
+      default:
+        return 'bg-gray-500/10 text-gray-600 dark:text-gray-400';
+    }
+  };
+
+  const formatPayload = (payload: Message['payload']) => {
+    const parts: string[] = [];
+    if (payload.price) parts.push(`Price=$${payload.price.toFixed(2)}`);
+    if (payload.sma) parts.push(`SMA=${payload.sma.toFixed(2)}`);
+    if (payload.rsi) parts.push(`RSI=${payload.rsi.toFixed(1)}`);
+    if (payload.action) parts.push(`Action=${payload.action}`);
+    if (payload.confidence) parts.push(`Confidence=${(payload.confidence * 100).toFixed(1)}%`);
+    if (payload.pnl !== undefined) parts.push(`P&L=$${payload.pnl.toFixed(2)}`);
+    return parts.join(', ');
+  };
+
+  return (
+    <div className="flex gap-3 py-2 border-b last:border-0">
+      <div className="flex-shrink-0">
+        <div className="flex flex-col items-center gap-1">
+          <div className="w-2 h-2 rounded-full bg-primary" />
+          <div className="w-px h-full bg-border" />
+        </div>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-sm font-medium">
+            {message.from.charAt(0).toUpperCase() + message.from.slice(1)}Agent
+          </span>
+          <span className="text-muted-foreground">→</span>
+          <span className="text-sm font-medium">
+            {message.to.charAt(0).toUpperCase() + message.to.slice(1)}Agent
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {new Date(message.timestamp).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })}
+          </span>
+        </div>
+        <Badge className={cn('mb-1', getMessageTypeColor(message.type))}>
+          {message.type}
+        </Badge>
+        <p className="text-sm text-muted-foreground">{formatPayload(message.payload)}</p>
+      </div>
+    </div>
+  );
+}
+
+export function MessageLog({ messages }: MessageLogProps) {
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [messages]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Agent Communication Feed</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div ref={scrollAreaRef}>
+          <ScrollArea className="h-[300px]">
+            <div className="space-y-1">
+              {messages.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No messages yet
+                </p>
+              ) : (
+                messages.map((message) => (
+                  <MessageItem key={message.id} message={message} />
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
