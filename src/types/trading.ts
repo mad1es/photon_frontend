@@ -81,7 +81,9 @@ export interface Portfolio {
 
 export interface MarketData {
   timestamp: Date;
+  symbol?: string;
   price: number;
+  previousPrice?: number;
   volume: number;
   sma20: number;
   sma50: number;

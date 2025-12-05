@@ -12,12 +12,13 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ heading }: DashboardHeaderProps) {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    setCurrentTime(new Date());
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -39,7 +40,9 @@ export function DashboardHeader({ heading }: DashboardHeaderProps) {
       <Separator orientation="vertical" className="mr-2 h-4" />
       <div className="flex-1">{heading}</div>
       <div className="flex items-center gap-4">
-        {mounted && <div className="text-sm font-medium text-foreground/80">{formatTime(currentTime)}</div>}
+        {mounted && currentTime && (
+          <div className="text-sm font-medium text-foreground/80">{formatTime(currentTime)}</div>
+        )}
         {mounted && (
           <Button
             variant="ghost"

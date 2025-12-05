@@ -12,14 +12,20 @@ interface EquityCurveProps {
   sharpeRatio: number;
 }
 
+interface EquityDataPoint {
+  day: number;
+  balance: number;
+  date: string;
+}
+
 export function EquityCurve({
   initialBalance,
   currentBalance,
   maxDrawdown,
   sharpeRatio,
 }: EquityCurveProps) {
-  const generateEquityData = () => {
-    const data = [];
+  const generateEquityData = (): EquityDataPoint[] => {
+    const data: EquityDataPoint[] = [];
     const days = 30;
     const startBalance = initialBalance;
     const endBalance = currentBalance;

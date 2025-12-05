@@ -169,13 +169,18 @@ function getMockData() {
     trades: mockTrades,
   };
 
+  // Market data for time series (used in charts)
   const mockMarketData: MarketData[] = Array.from({ length: 100 }, (_, i) => {
     const timestamp = new Date(now.getTime() - (100 - i) * 60000);
     const basePrice = 150.0;
     const variation = Math.sin(i / 10) * 2 + Math.random() * 0.5;
+    const price = basePrice + variation;
+    const previousPrice = i > 0 ? basePrice + Math.sin((i - 1) / 10) * 2 + Math.random() * 0.5 : price;
     return {
       timestamp,
-      price: basePrice + variation,
+      symbol: 'AAPL',
+      price,
+      previousPrice,
       volume: 1000000 + Math.random() * 500000,
       sma20: basePrice - 0.5 + Math.sin(i / 15) * 1,
       sma50: basePrice - 1 + Math.sin(i / 20) * 1.5,
@@ -189,6 +194,25 @@ function getMockData() {
     price: data.price,
     volume: data.volume,
   }));
+
+  // Market data for heatmap (different symbols)
+  const symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX', 'AMD', 'INTC'];
+  const mockMarketHeatmapData: MarketData[] = symbols.map((symbol, index) => {
+    const basePrice = 100 + index * 50 + Math.random() * 20;
+    const price = basePrice + (Math.random() - 0.5) * 10;
+    const previousPrice = basePrice + (Math.random() - 0.5) * 10;
+    return {
+      timestamp: now,
+      symbol,
+      price,
+      previousPrice,
+      volume: 1000000 + Math.random() * 2000000,
+      sma20: basePrice - 2,
+      sma50: basePrice - 5,
+      rsi: 40 + Math.random() * 40,
+      macd: (Math.random() - 0.5) * 2,
+    };
+  });
 
   const mockPerformanceMetrics: PerformanceMetrics = {
     totalReturn: 2450.0,
@@ -231,6 +255,7 @@ function getMockData() {
     mockPortfolio,
     mockMarketData,
     mockChartData,
+    mockMarketHeatmapData,
     mockPerformanceMetrics,
     mockSimulationSettings,
   };
@@ -245,5 +270,6 @@ export const mockTrades = mockData.mockTrades;
 export const mockPortfolio = mockData.mockPortfolio;
 export const mockMarketData = mockData.mockMarketData;
 export const mockChartData = mockData.mockChartData;
+export const mockMarketHeatmapData = mockData.mockMarketHeatmapData;
 export const mockPerformanceMetrics = mockData.mockPerformanceMetrics;
 export const mockSimulationSettings = mockData.mockSimulationSettings;

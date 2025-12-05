@@ -21,7 +21,13 @@ export const getCachedLoggedInVerifiedSupabaseUser = cache(async () => {
 
   const supabase = await createSupabaseClient();
   if (!supabase) {
-    throw new Error('Supabase is not configured');
+    // Если Supabase не настроен, возвращаем дефолтного пользователя
+    return {
+      user: {
+        id: 'default-user-id',
+        email: 'user@example.com',
+      },
+    };
   }
 
   const { data, error } = await supabase.auth.getUser();
@@ -47,7 +53,11 @@ export const getCachedLoggedInSupabaseUser = cache(async () => {
 
   const supabase = await createSupabaseClient();
   if (!supabase) {
-    throw new Error('Supabase is not configured');
+    // Если Supabase не настроен, возвращаем дефолтного пользователя
+    return {
+      id: 'default-user-id',
+      email: 'user@example.com',
+    } as any;
   }
 
   const { data, error } = await supabase.auth.getSession();
@@ -74,7 +84,11 @@ export const getCachedLoggedInUserClaims = cache(async () => {
 
   const supabase = await createSupabaseClient();
   if (!supabase) {
-    throw new Error('Supabase is not configured');
+    // Если Supabase не настроен, возвращаем дефолтные claims
+    return {
+      sub: 'default-user-id',
+      email: 'user@example.com',
+    };
   }
 
   const { data, error } = await supabase.auth.getClaims();
@@ -93,9 +107,23 @@ export const getCachedIsUserLoggedIn = cache(async () => {
     return await hasDevSession();
   }
 
-  const claims = await getCachedLoggedInUserClaims();
-  console.log('claims', claims);
-  return claims.sub !== null;
+  const supabase = await createSupabaseClient();
+  if (!supabase) {
+    // Если Supabase не настроен, считаем что пользователь авторизован
+    return true;
+  }
+
+  try {
+    const { data, error } = await supabase.auth.getClaims();
+    if (error || !data?.claims) {
+      return false;
+    }
+    console.log('claims', data.claims);
+    return data.claims.sub !== null;
+  } catch (error) {
+    // Если произошла ошибка, считаем что пользователь не авторизован
+    return false;
+  }
 });
 
 export const getCachedLoggedInUserId = cache(async () => {
@@ -104,6 +132,11 @@ export const getCachedLoggedInUserId = cache(async () => {
     return userId || 'dev-user-id';
   }
 
-  const claims = await getCachedLoggedInUserClaims();
-  return claims.sub;
+  try {
+    const claims = await getCachedLoggedInUserClaims();
+    return claims.sub;
+  } catch (error) {
+    // Если произошла ошибка, возвращаем дефолтный ID
+    return 'default-user-id';
+  }
 });

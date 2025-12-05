@@ -13,6 +13,7 @@ import {
   mockPortfolio,
   mockChartData,
   mockMarketData,
+  mockMarketHeatmapData,
   mockTrades,
 } from '@/lib/mock-data';
 
@@ -44,7 +45,7 @@ function DashboardContent() {
       {/* Market Chart & Heatmap Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         <MarketChart data={mockChartData} symbol="AAPL" currentPrice={currentPrice} />
-        <MarketHeatmap marketData={mockMarketData} />
+        <MarketHeatmap marketData={mockMarketHeatmapData} />
       </div>
 
       {/* Trade Activity Feed & Agent Communication Log */}

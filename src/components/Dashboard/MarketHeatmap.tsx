@@ -11,8 +11,12 @@ interface MarketHeatmapProps {
 }
 
 export function MarketHeatmap({ marketData }: MarketHeatmapProps) {
-  // Get top gainers and losers
-  const sortedData = [...marketData]
+  // Filter data with required fields and get top gainers and losers
+  const validData = marketData.filter(
+    (item) => item.symbol && item.previousPrice !== undefined
+  ) as Array<MarketData & { symbol: string; previousPrice: number }>;
+
+  const sortedData = [...validData]
     .sort((a, b) => (b.price - b.previousPrice) - (a.price - a.previousPrice))
     .slice(0, 10);
 

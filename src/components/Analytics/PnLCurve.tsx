@@ -10,9 +10,15 @@ interface PnLCurveProps {
   currentBalance: number;
 }
 
+interface PnLDataPoint {
+  day: number;
+  balance: number;
+  date: string;
+}
+
 export function PnLCurve({ initialBalance, currentBalance }: PnLCurveProps) {
-  const generatePnLData = () => {
-    const data = [];
+  const generatePnLData = (): PnLDataPoint[] => {
+    const data: PnLDataPoint[] = [];
     const days = 30;
     const startBalance = initialBalance;
     const endBalance = currentBalance;
