@@ -1,0 +1,70 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            set -e
+            
+            echo "=== Начало деплоя ==="
+            
+            # Определяем команду docker-compose
+            if command -v docker-compose &> /dev/null; then
+              COMPOSE_CMD="docker-compose"
+            else
+              COMPOSE_CMD="docker compose"
+            fi
+            
+            # Переходим в директорию проекта или клонируем
+            if [ ! -d ~/photon-frontend ]; then
+              echo "Клонируем репозиторий..."
+              git clone ${{ secrets.REPO_URL }} ~/photon-frontend
+            fi
+            
+            cd ~/photon-frontend
+            
+            echo "Обновляем код из репозитория..."
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
+            
+            # Останавливаем старый контейнер
+            echo "Останавливаем старый контейнер..."
+            $COMPOSE_CMD down || true
+            
+            # Удаляем старый образ для освобождения места
+            echo "Очищаем старые образы..."
+            docker image prune -f || true
+            
+            # Собираем и запускаем новый контейнер
+            echo "Собираем новый образ..."
+            $COMPOSE_CMD build --no-cache
+            
+            echo "Запускаем контейнер..."
+            $COMPOSE_CMD up -d
+            
+            # Ждем запуска контейнера
+            sleep 10
+            
+            # Проверяем статус
+            echo "Проверяем статус контейнера..."
+            $COMPOSE_CMD ps
+            
+            echo "Последние логи:"
+            $COMPOSE_CMD logs --tail=30 photon-frontend
+            
+            echo "=== Деплой завершен ==="
