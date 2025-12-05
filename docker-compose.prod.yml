@@ -1,21 +1,22 @@
+version: '3.8'
+
 services:
-  photon-frontend:
+  frontend:
     build:
       context: .
-      dockerfile: Dockerfile
-      args:
-        - BUILDKIT_INLINE_CACHE=1
+      dockerfile: Dockerfile.prod
     container_name: photon-frontend
     restart: unless-stopped
     ports:
       - "3001:3001"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - HOSTNAME=0.0.0.0
     networks:
-      - photon-network
+      - bizdin-network
 
 networks:
-  photon-network:
-    driver: bridge
+  bizdin-network:
+    external: true
