@@ -46,7 +46,7 @@
   --background: #fff;
   --foreground: #000;
   
-  /* Public.com brand colors */
+  /* Public.com brand colors - extended palette */
   --blue-brand: #0038ff;
   --blue-link: #0027b3;
   --blue-link-hover: #0038df;
@@ -61,12 +61,90 @@
   --green-success: #4dc16d;
   --red-error: #ff0066;
   
+  /* Public.com greyscale palette */
+  --pw-greyscale-50: #fbfbfc;
+  --pw-greyscale-100: #fff;
+  --pw-greyscale-200: #f6f8f9;
+  --pw-greyscale-300: #eef0f2;
+  --pw-greyscale-400: #d4d9df;
+  --pw-greyscale-500: #a8b4bf;
+  --pw-greyscale-600: #516880;
+  --pw-greyscale-1000: #000;
+  
+  /* Public.com blue palette */
+  --pw-blue-50: #f2f5ff;
+  --pw-blue-100: #e5ebff;
+  --pw-blue-200: #bfcdff;
+  --pw-blue-300: #99afff;
+  --pw-blue-400: #7392ff;
+  --pw-blue-500: #4d74ff;
+  --pw-blue-600: #0038ff;
+  --pw-blue-700: #0027b3;
+  --pw-blue-800: #001f8c;
+  --pw-blue-900: #001666;
+  --pw-blue-1000: #000e40;
+  
   /* Public.com exact gradients from SVG */
   --gradient-blue: linear-gradient(135deg, #00a0ff 0%, #00e3ff 100%);
   --gradient-yellow: linear-gradient(135deg, #ffe000 0%, #ff9c00 100%);
   --gradient-red: linear-gradient(135deg, #ff3a44 0%, #c31162 100%);
   --gradient-green: linear-gradient(135deg, #32a071 0%, #00f076 100%);
   --gradient-primary: linear-gradient(135deg, #0038ff 0%, #4d74ff 100%);
+  
+  /* Public.com elevation system */
+  --elevation-100: 0px 2px 6px rgba(0, 0, 0, 0.12);
+  --elevation-200: 0px 4px 12px rgba(0, 0, 0, 0.12);
+  --elevation-300: 0px 8px 16px rgba(0, 0, 0, 0.12);
+  --elevation-400: 0px 4px 24px rgba(0, 0, 0, 0.12);
+  --elevation-right: 4px 0px 12px rgba(0, 0, 0, 0.04);
+  --elevation-top: 0px -4px 12px rgba(0, 0, 0, 0.04);
+  
+  /* Public.com typography */
+  --font-main: "Inter", Helvetica, Arial, sans-serif;
+  --font-header: "Denton", serif;
+  --font-alpha: "Alpha", monospace;
+  
+  /* Public.com font sizes */
+  --font-hxl: 600 48px/120% var(--font-main);
+  --font-h1: 600 30px/120% var(--font-main);
+  --font-h2: 600 24px/120% var(--font-main);
+  --font-h3: 600 18px/140% var(--font-main);
+  --font-body-focus: 400 18px/160% var(--font-main);
+  --font-body-1-light: 400 14px/140% var(--font-main);
+  --font-body-1-heavy: 600 14px/140% var(--font-main);
+  --font-body-2-light: 400 12px/120% var(--font-main);
+  --font-body-2-heavy: 600 12px/120% var(--font-main);
+  --font-body-3-light: 400 10px/120% var(--font-main);
+  --font-body-3-heavy: 600 10px/120% var(--font-main);
+  
+  /* Public.com spacing */
+  --gap-objects-micro: 4px;
+  --gap-objects-tight: 8px;
+  --gap-objects-compact: 12px;
+  --gap-objects-standard: 16px;
+  --gap-objects-wide: 24px;
+  --gap-objects-extrawide: 48px;
+  --gap-section: 80px;
+  --gap-subsection: 32px;
+  
+  /* Public.com padding */
+  --padding-micro: 8px;
+  --padding-tight: 10px;
+  --padding-compact: 12px;
+  --padding-standard: 16px;
+  --padding-wide: 24px;
+  --padding-content-area: 32px;
+  --padding-extrawide: 48px;
+  --padding-huge: 64px;
+  --padding-massive: 88px;
+  
+  /* Public.com border radius */
+  --radius-small: 4px;
+  --radius-small-default: 8px;
+  --radius-default: 8px;
+  --radius-large: 18px;
+  --radius-round: 100px;
+  --radius-modal: 32px;
 }
 
 .dark {
@@ -326,6 +404,31 @@
     background: var(--gradient-primary);
   }
   
+  /* Elevation utilities */
+  .elevation-100 {
+    box-shadow: var(--elevation-100);
+  }
+  
+  .elevation-200 {
+    box-shadow: var(--elevation-200);
+  }
+  
+  .elevation-300 {
+    box-shadow: var(--elevation-300);
+  }
+  
+  .elevation-400 {
+    box-shadow: var(--elevation-400);
+  }
+  
+  .elevation-right {
+    box-shadow: var(--elevation-right);
+  }
+  
+  .elevation-top {
+    box-shadow: var(--elevation-top);
+  }
+  
   /* Gradient text */
   .text-gradient-blue {
     background: var(--gradient-blue);
@@ -453,6 +556,22 @@
     }
     50% {
       box-shadow: 0 0 40px oklch(0.6 0.2 250 / 0.6), 0 0 60px oklch(0.6 0.2 250 / 0.3);
+    }
+  }
+
+  /* Spotlight entrance */
+  .animate-spotlight {
+    animation: spotlight-fade 1.2s ease-out forwards;
+  }
+
+  @keyframes spotlight-fade {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 8%, 0) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
     }
   }
 }

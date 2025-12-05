@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { T } from '@/components/ui/Typography';
+import { SplineSceneBasic } from '@/components/ui/demo';
 import {
   ArrowRight,
   Brain,
@@ -34,13 +35,13 @@ export default function LandingPage() {
   return (
     <>
       {/* Navbar */}
-      <nav className="w-full border-b border-border/50 bg-card/30 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="w-full backdrop-blur-2xl bg-background/5 sticky top-0 z-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="h-6 w-6 text-primary" />
               <span className="text-xl font-bold text-foreground">
-                Photon
+                photon
               </span>
             </div>
             <div className="flex items-center gap-4">
@@ -68,39 +69,44 @@ export default function LandingPage() {
       <section className="relative w-full py-20 md:py-32 lg:py-40 overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-transparent to-transparent"></div>
         <div className="container px-4 md:px-6 mx-auto">
-          <div className="flex flex-col items-center gap-8 text-center">
-            <div className="flex flex-col items-center gap-6">
-              <Badge variant="outline" className="inline-flex items-center gap-2 px-4 py-1.5">
-                <Brain className="h-3.5 w-3.5 text-primary" />
-                <span>AI-Powered Multi-Agent Trading System</span>
-              </Badge>
-              <T.H1 className="text-5xl font-bold leading-tight tracking-tight sm:text-6xl md:text-7xl lg:text-8xl text-balance">
-                AI-Powered Trading.
-                <br />
-                <span className="text-primary">
-                  Human-Level Control.
-                </span>
-              </T.H1>
-              <T.P className="mx-auto max-w-[700px] text-lg text-muted-foreground md:text-xl">
-                Three coordinated AI agents work 24/7 to monitor markets, make decisions, and execute trades—giving you automated intelligence with complete transparency.
-              </T.P>
+          <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+            <div className="flex flex-col items-center gap-8 text-center lg:mt-12">
+              <div className="flex flex-col items-center gap-6">
+                <Badge variant="outline" className="inline-flex items-center gap-2 px-4 py-1.5">
+                  <Brain className="h-3.5 w-3.5 text-primary" />
+                  <span>AI-Powered Multi-Agent Trading System</span>
+                </Badge>
+                <T.H1 className="text-5xl font-bold leading-tight tracking-tight sm:text-6xl md:text-7xl lg:text-8xl text-balance">
+                  AI-Powered Trading.
+                  <br />
+                  <span className="text-primary">
+                    Human-Level Control.
+                  </span>
+                </T.H1>
+                <T.P className="mx-auto max-w-[700px] text-lg text-muted-foreground md:text-xl">
+                  Three coordinated AI agents work 24/7 to monitor markets, make decisions, and execute trades—giving you automated intelligence with complete transparency.
+                </T.P>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <Button size="lg" className="bg-gradient-primary text-white" asChild>
+                  <Link href="/login">
+                    Try Demo <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="#how-it-works">
+                    <Play className="mr-2 h-4 w-4" /> Watch How It Works
+                  </Link>
+                </Button>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Button size="lg" className="bg-gradient-primary text-white" asChild>
-                <Link href="/login">
-                  Try Demo <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="#how-it-works">
-                  <Play className="mr-2 h-4 w-4" /> Watch How It Works
-                </Link>
-              </Button>
+            <div className="order-first lg:order-none lg:ml-8 lg:-mt-20">
+              <SplineSceneBasic />
             </div>
           </div>
 
           {/* Agent Communication Visualization */}
-          <div className="mt-20 md:mt-32">
+          <div className="mt-16 md:mt-28">
             <div className="relative w-full max-w-6xl mx-auto">
               <div className="absolute -inset-1 bg-gradient-primary rounded-2xl blur-xl opacity-20"></div>
               <Card className="relative card-glass">

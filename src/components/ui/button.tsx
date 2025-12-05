@@ -5,29 +5,38 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-300 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--pw-blue-600)] focus-visible:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "bg-gradient-primary text-primary-foreground hover:opacity-90 hover:scale-105 shadow-lg shadow-primary/20 active:scale-95",
+        default: "bg-[var(--pw-greyscale-1000)] text-white hover:bg-[var(--pw-blue-800)] focus:bg-[var(--pw-blue-900)]",
+        primary: "bg-[var(--pw-greyscale-1000)] text-white hover:bg-[var(--pw-blue-800)] focus:bg-[var(--pw-blue-900)]",
         destructive:
-          "bg-gradient-to-r from-[#FF3A44] to-[#C31162] text-white hover:opacity-90 hover:scale-105 focus-visible:ring-destructive/20 shadow-lg shadow-destructive/20 active:scale-95",
+          "bg-gradient-to-r from-[#FF3A44] to-[#C31162] text-white hover:opacity-95 focus:opacity-95",
         outline:
-          "border border-border/50 bg-card/50 backdrop-blur-sm shadow-xs hover:bg-accent hover:text-accent-foreground hover:border-accent/50 hover:scale-105 hover:shadow-md active:scale-95",
+          "border border-border/50 bg-card/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground hover:border-accent/50",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/50 hover:scale-105 active:scale-95",
+          "bg-[var(--pw-greyscale-200)] text-[var(--pw-greyscale-1000)] hover:bg-[var(--pw-greyscale-300)]",
         ghost:
-          "hover:bg-accent/50 hover:text-accent-foreground hover:scale-105 active:scale-95",
-        link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-gradient-primary text-white hover:opacity-90 hover:scale-105 shadow-lg shadow-primary/20 active:scale-95",
+          "hover:bg-[var(--pw-greyscale-200)] hover:text-[var(--pw-greyscale-1000)]",
+        link: "text-[var(--pw-blue-600)] underline-offset-4 hover:underline",
+        gradient: "bg-gradient-primary text-white hover:opacity-90",
+        hairline: "bg-transparent border border-[var(--pw-greyscale-1000)] text-[var(--pw-greyscale-1000)] hover:border-[var(--pw-blue-900)] hover:text-[var(--pw-blue-900)]",
+        hairlineSecondary: "bg-transparent border border-[var(--pw-greyscale-400)] text-[var(--pw-greyscale-1000)] hover:border-[var(--pw-greyscale-500)] hover:text-[var(--pw-greyscale-1000)]",
+        overlay: "backdrop-blur-[56px] bg-[rgba(0,0,0,0.4)] text-white hover:brightness-90",
+        terminal: "bg-[var(--red-error)] text-white hover:brightness-95",
+        terminalSecondary: "bg-[#ffe9e5] text-[var(--red-error)] hover:brightness-95",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
+        xs: "h-7 min-w-[64px] px-3 text-[var(--font-body-2-heavy)] [&_svg]:size-2.5",
+        sm: "h-8 min-w-[68px] px-3.5 text-[var(--font-body-2-heavy)] [&_svg]:size-2.5",
+        default: "h-9 px-4 text-[var(--font-body-1-heavy)]",
+        md: "h-10 min-w-[92px] px-4 text-[var(--font-body-1-heavy)]",
+        lg: "h-12 min-w-[92px] px-5.5 text-[var(--font-body-1-heavy)]",
+        icon: "size-9 rounded-full",
+        "icon-sm": "size-8 rounded-full",
+        "icon-md": "size-10 rounded-full",
+        "icon-lg": "size-12 rounded-full",
       },
     },
     defaultVariants: {
