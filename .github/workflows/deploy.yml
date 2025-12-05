@@ -47,8 +47,18 @@ jobs:
             echo "Stopping old container..."
             docker compose down || true
             
-            echo "Building new image..."
-            docker compose build --no-cache
+            echo "Checking system resources..."
+            free -h
+            df -h
+            
+            echo "Building new image (this may take 5-10 minutes)..."
+            timeout 1800 DOCKER_BUILDKIT=1 docker compose build --progress=plain --no-cache || {
+              echo "Build failed or timed out. Checking logs..."
+              docker compose logs || true
+              echo "System resources after failed build:"
+              free -h
+              exit 1
+            }
             
             echo "Starting container..."
             docker compose up -d

@@ -7,17 +7,26 @@ RUN corepack enable && corepack prepare pnpm@9.0.6 --activate
 FROM base AS deps
 WORKDIR /app
 
+# Увеличиваем лимит памяти для установки зависимостей (уменьшено для сервера с 3.8GB RAM)
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
 # Копируем файлы для установки зависимостей
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --prefer-offline --no-optional
 
 # Сборка приложения
 FROM base AS builder
 WORKDIR /app
 
+# Увеличиваем лимит памяти для Node.js и оптимизируем сборку (уменьшено для сервера с 3.8GB RAM)
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV SKIP_ENV_VALIDATION=1
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Собираем приложение
 RUN pnpm build
 
 # Production образ

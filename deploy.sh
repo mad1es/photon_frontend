@@ -27,8 +27,10 @@ echo "Stopping old container..."
 docker compose down || true
 
 # Собираем новый образ
-echo "Building new image..."
-docker compose build --no-cache
+echo "Building new image (this may take 5-10 minutes)..."
+echo "Available memory:"
+free -h
+DOCKER_BUILDKIT=1 docker compose build --progress=plain --no-cache
 
 # Запускаем контейнер
 echo "Starting container..."
