@@ -8,12 +8,12 @@ services:
     container_name: photon-frontend
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "3002:3002"
     env_file:
       - .env
     environment:
       - NODE_ENV=production
-      - PORT=3001
+      - PORT=3002
     networks:
       - bizdin-network
 
