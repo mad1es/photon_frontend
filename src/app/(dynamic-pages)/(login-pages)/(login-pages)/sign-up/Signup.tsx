@@ -29,12 +29,10 @@ export function SignUp({ next }: SignUpProps) {
   const router = useRouter();
 
   function redirectToDashboard() {
-    setRedirectInProgress(true);
-    router.refresh();
     if (next) {
-      window.location.href = `/auth/callback?next=${encodeURIComponent(next)}`;
+      router.push(`/auth/callback?next=${next}`);
     } else {
-      window.location.href = '/auth/callback';
+      router.push('/dashboard');
     }
   }
 
@@ -52,6 +50,7 @@ export function SignUp({ next }: SignUpProps) {
         toast.success('Account created!', { id: toastRef.current });
         toastRef.current = undefined;
         redirectToDashboard();
+        setRedirectInProgress(true);
       },
       onError: ({ error }) => {
         const errorMessage = error.serverError ?? 'Failed to create account';

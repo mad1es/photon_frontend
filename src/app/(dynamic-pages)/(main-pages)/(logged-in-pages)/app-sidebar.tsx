@@ -6,7 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { getCachedLoggedInVerifiedSupabaseUser, getCachedIsUserLoggedIn } from '@/rsc-data/supabase';
+import { getCachedLoggedInVerifiedUser } from '@/rsc-data/auth';
 import { Zap } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -38,16 +38,8 @@ async function SidebarHeaderContent() {
 
 
 async function SidebarContentWrapper() {
-  try {
-    const isLoggedIn = await getCachedIsUserLoggedIn();
-    if (!isLoggedIn) {
-      return null;
-    }
-    const { user } = await getCachedLoggedInVerifiedSupabaseUser();
-    return <AppSidebarContent user={user as any} />
-  } catch (error) {
-    return null;
-  }
+  const { user } = await getCachedLoggedInVerifiedUser();
+  return <AppSidebarContent user={user as any} />
 }
 
 

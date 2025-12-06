@@ -42,6 +42,35 @@ class ServerApiClient {
       const response = await fetch(url, config);
 
       if (response.status === 401) {
+        const refreshToken = cookieStore.get('refresh_token')?.value;
+        if (refreshToken) {
+          try {
+            const refreshResponse = await fetch(`${this.baseURL}/auth/refresh/`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refresh: refreshToken }),
+            });
+
+            if (refreshResponse.ok) {
+              const refreshData = await refreshResponse.json();
+              cookieStore.set('access_token', refreshData.access, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 60 * 30,
+              });
+              headers['Authorization'] = `Bearer ${refreshData.access}`;
+              const retryResponse = await fetch(url, config);
+              if (retryResponse.ok) {
+                return await retryResponse.json();
+              }
+            }
+          } catch (refreshError) {
+            cookieStore.delete('access_token');
+            cookieStore.delete('refresh_token');
+            throw new Error('Session expired');
+          }
+        }
         throw new Error('Unauthorized');
       }
 

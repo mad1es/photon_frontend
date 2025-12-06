@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
-import { getCachedLoggedInVerifiedSupabaseUser } from '@/rsc-data/supabase';
+import { getCachedLoggedInVerifiedUser } from '@/rsc-data/auth';
 import { UpdatePassword } from './UpdatePassword';
 
 async function UpdatePasswordContent() {
-  await getCachedLoggedInVerifiedSupabaseUser();
+  await getCachedLoggedInVerifiedUser();
   return <UpdatePassword />;
 }
 

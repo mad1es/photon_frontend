@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar";
 import { signOutAction } from "@/data/auth/sign-out";
-import { User } from "@/rsc-data/supabase";
+import { User } from "@/rsc-data/auth";
 import { ChevronUp, Home, LogOut, Settings, Wallet, Users, BarChart3, Cog } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

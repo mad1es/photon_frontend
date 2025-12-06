@@ -1,5 +1,5 @@
 import { serverApiClient } from '@/lib/api-client-server';
-import { getServerAccessToken } from '@/utils/jwt-tokens';
+import { getServerAccessToken, getServerRefreshToken } from '@/utils/jwt-tokens';
 import { cache } from 'react';
 
 export interface User {
@@ -9,7 +9,7 @@ export interface User {
   date_joined?: string;
 }
 
-export const getCachedLoggedInVerifiedSupabaseUser = cache(async () => {
+export const getCachedLoggedInVerifiedUser = cache(async () => {
   const token = await getServerAccessToken();
   if (!token) {
     throw new Error('No user found');
@@ -28,11 +28,40 @@ export const getCachedLoggedInVerifiedSupabaseUser = cache(async () => {
       },
     };
   } catch (error) {
+    const refreshToken = await getServerRefreshToken();
+    if (refreshToken) {
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          const { setServerAuthTokens } = await import('@/utils/jwt-tokens');
+          await setServerAuthTokens(refreshData.access, refreshToken);
+          const retryUser = await serverApiClient.getCurrentUser();
+          if (retryUser) {
+            return {
+              user: {
+                id: String(retryUser.id),
+                email: retryUser.email,
+                full_name: retryUser.full_name,
+              },
+            };
+          }
+        }
+      } catch {
+        throw new Error('No user found');
+      }
+    }
     throw new Error('No user found');
   }
 });
 
-export const getCachedLoggedInSupabaseUser = cache(async () => {
+export const getCachedLoggedInUser = cache(async () => {
   const token = await getServerAccessToken();
   if (!token) {
     throw new Error('No user found');
@@ -95,3 +124,4 @@ export const getCachedLoggedInUserId = cache(async () => {
     return null;
   }
 });
+
