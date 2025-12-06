@@ -13,10 +13,10 @@ export const ExternalNavigation = () => {
             <MountainIcon className="h-6 w-6" />
           </div>
           <T.H3 className="hidden lg:block text-xl font-semibold leading-tight mt-0">
-            Nextbase Open Source
+            photon
           </T.H3>
           <T.H3 className="block lg:hidden text-xl font-semibold leading-tight mt-0">
-            Nextbase
+            photon
           </T.H3>
         </Link>
         <nav className="ml-auto flex items-center gap-2 sm:gap-4">
