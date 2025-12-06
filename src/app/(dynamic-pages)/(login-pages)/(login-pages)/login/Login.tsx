@@ -34,10 +34,12 @@ export function Login({
   const router = useRouter();
 
   function redirectToDashboard() {
+    setRedirectInProgress(true);
+    router.refresh();
     if (next) {
-      router.push(`/auth/callback?next=${next}`);
+      window.location.href = `/auth/callback?next=${encodeURIComponent(next)}`;
     } else {
-      router.push('/dashboard');
+      window.location.href = '/auth/callback';
     }
   }
 
@@ -57,7 +59,6 @@ export function Login({
         });
         toastRef.current = undefined;
         redirectToDashboard();
-        setRedirectInProgress(true);
       },
       onError: (error) => {
         const errorMessage =
