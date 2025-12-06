@@ -1,29 +1,54 @@
-
 'use server'
 
-import { createSupabaseClient } from "@/supabase-clients/server";
-import { getDevUserId, isDevAuthEnabled } from "@/utils/dev-auth";
+import { serverApiClient } from '@/lib/api-client-server';
+import { getServerAccessToken, getServerRefreshToken } from '@/utils/jwt-tokens';
 
-export async function getLoggedInUserId() {
-  // Dev режим: возвращаем dev user ID если есть сессия
-  if (isDevAuthEnabled()) {
-    const devUserId = await getDevUserId();
-    if (devUserId) {
-      return devUserId;
+export async function getLoggedInUserId(): Promise<string> {
+  const token = await getServerAccessToken();
+  if (!token) {
+    throw new Error('User not logged in');
+  }
+
+  try {
+    const user = await serverApiClient.getCurrentUser();
+    if (!user) {
+      const refreshToken = await getServerRefreshToken();
+      if (refreshToken) {
+        const { refreshTokenAction } = await import('@/data/auth/auth');
+        await refreshTokenAction();
+        const retryUser = await serverApiClient.getCurrentUser();
+        if (retryUser) {
+          return String(retryUser.id);
+        }
+      }
+      throw new Error('User not logged in');
     }
+    return String(user.id);
+  } catch (error) {
+    throw new Error('User not logged in');
+  }
+}
+
+export async function getCurrentUser() {
+  const token = await getServerAccessToken();
+  if (!token) {
+    return null;
   }
 
-  const supabase = await createSupabaseClient();
-  if (!supabase) {
-    throw new Error('User not logged in');
+  try {
+    const user = await serverApiClient.getCurrentUser();
+    return user;
+  } catch {
+    const refreshToken = await getServerRefreshToken();
+    if (refreshToken) {
+      try {
+        const { refreshTokenAction } = await import('@/data/auth/auth');
+        await refreshTokenAction();
+        return await serverApiClient.getCurrentUser();
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
-
-  const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims?.sub) {
-    throw new Error('User not logged in');
-  }
-  if (!data?.claims?.sub) {
-    throw new Error('User not logged in');
-  }
-  return data.claims.sub;
 }

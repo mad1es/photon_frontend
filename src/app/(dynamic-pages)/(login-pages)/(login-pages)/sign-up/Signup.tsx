@@ -3,9 +3,10 @@
 import { useAction } from 'next-safe-action/hooks';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 import { EmailAndPassword } from '@/components/Auth/EmailAndPassword';
-import { EmailConfirmationPendingCard } from '@/components/Auth/EmailConfirmationPendingCard';
+import { RedirectingPleaseWaitCard } from '@/components/Auth/RedirectingPleaseWaitCard';
 import {
   signUpAction,
 } from '@/data/auth/auth';
@@ -23,8 +24,17 @@ interface SignUpProps {
 }
 
 export function SignUp({ next }: SignUpProps) {
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [redirectInProgress, setRedirectInProgress] = useState(false);
   const toastRef = useRef<string | number | undefined>(undefined);
+  const router = useRouter();
+
+  function redirectToDashboard() {
+    if (next) {
+      router.push(`/auth/callback?next=${next}`);
+    } else {
+      router.push('/dashboard');
+    }
+  }
 
   const { execute: executeSignUp, status: signUpStatus } = useAction(
     signUpAction,
@@ -32,10 +42,15 @@ export function SignUp({ next }: SignUpProps) {
       onExecute: () => {
         toastRef.current = toast.loading('Creating account...');
       },
-      onSuccess: () => {
+      onSuccess: ({ data }) => {
+        if (data?.result?.access && data?.result?.refresh) {
+          localStorage.setItem('access_token', data.result.access);
+          localStorage.setItem('refresh_token', data.result.refresh);
+        }
         toast.success('Account created!', { id: toastRef.current });
         toastRef.current = undefined;
-        setSuccessMessage('A confirmation link has been sent to your email!');
+        redirectToDashboard();
+        setRedirectInProgress(true);
       },
       onError: ({ error }) => {
         const errorMessage = error.serverError ?? 'Failed to create account';
@@ -45,14 +60,12 @@ export function SignUp({ next }: SignUpProps) {
     }
   );
 
-  if (successMessage) {
+  if (redirectInProgress) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <EmailConfirmationPendingCard
-          type="sign-up"
-          heading="Confirmation Link Sent"
-          message={successMessage}
-          resetSuccessMessage={setSuccessMessage}
+        <RedirectingPleaseWaitCard
+          message="Please wait while we redirect you to your dashboard."
+          heading="Redirecting to Dashboard"
         />
       </div>
     );
