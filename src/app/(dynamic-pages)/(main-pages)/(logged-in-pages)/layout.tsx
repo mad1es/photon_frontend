@@ -11,12 +11,37 @@ import { AppSidebar } from './app-sidebar';
 import { DashboardHeader } from '@/components/Layout/DashboardHeader';
 import Footer from '@/components/Footer';
 
-async function ChildrenWrapper({ children }: { children: ReactNode }) {
+async function AuthCheck({ children }: { children: ReactNode }) {
   const isLoggedIn = await getCachedIsUserLoggedIn();
   if (!isLoggedIn) {
     redirect('/login');
   }
   return <>{children}</>;
+}
+
+async function LayoutContent({
+  children,
+  heading,
+}: {
+  children: ReactNode;
+  heading: ReactNode;
+}) {
+  return (
+    <SidebarProvider>
+      <Suspense fallback={null}>
+        <AppSidebar />
+      </Suspense>
+      <SidebarInset className="flex flex-col min-h-screen">
+        <DashboardHeader heading={heading} />
+        <div className="flex-1">
+          <Suspense fallback={<div className="flex-1 p-8">Loading...</div>}>
+            <AuthCheck>{children}</AuthCheck>
+          </Suspense>
+        </div>
+        <Footer />
+      </SidebarInset>
+    </SidebarProvider>
+  );
 }
 
 export default async function Layout({
@@ -26,23 +51,9 @@ export default async function Layout({
   children: ReactNode;
   heading: ReactNode;
 }) {
-  const isLoggedIn = await getCachedIsUserLoggedIn();
-  if (!isLoggedIn) {
-    redirect('/login');
-  }
-
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="flex flex-col min-h-screen">
-        <DashboardHeader heading={heading} />
-        <div className="flex-1">
-        <Suspense fallback={null}>
-          <ChildrenWrapper>{children}</ChildrenWrapper>
-        </Suspense>
-        </div>
-        <Footer />
-      </SidebarInset>
-    </SidebarProvider>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <LayoutContent heading={heading}>{children}</LayoutContent>
+    </Suspense>
   );
 }
