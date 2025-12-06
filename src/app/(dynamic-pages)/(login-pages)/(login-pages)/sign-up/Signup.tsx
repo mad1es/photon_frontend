@@ -26,15 +26,8 @@ interface SignUpProps {
 export function SignUp({ next }: SignUpProps) {
   const [redirectInProgress, setRedirectInProgress] = useState(false);
   const toastRef = useRef<string | number | undefined>(undefined);
+  const hasRedirectedRef = useRef(false);
   const router = useRouter();
-
-  function redirectToDashboard() {
-    if (next) {
-      router.push(`/auth/callback?next=${next}`);
-    } else {
-      router.push('/dashboard');
-    }
-  }
 
   const { execute: executeSignUp, status: signUpStatus } = useAction(
     signUpAction,
@@ -43,14 +36,24 @@ export function SignUp({ next }: SignUpProps) {
         toastRef.current = toast.loading('Creating account...');
       },
       onSuccess: ({ data }) => {
+        if (hasRedirectedRef.current) return;
+        hasRedirectedRef.current = true;
+
         if (data?.access && data?.refresh) {
           localStorage.setItem('access_token', data.access);
           localStorage.setItem('refresh_token', data.refresh);
         }
         toast.success('Account created!', { id: toastRef.current });
         toastRef.current = undefined;
-        redirectToDashboard();
         setRedirectInProgress(true);
+        
+        setTimeout(() => {
+          if (next) {
+            router.replace(`/auth/callback?next=${next}`);
+          } else {
+            router.replace('/dashboard');
+          }
+        }, 100);
       },
       onError: ({ error }) => {
         const errorMessage = error.serverError ?? 'Failed to create account';
