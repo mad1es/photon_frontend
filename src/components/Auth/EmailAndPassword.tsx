@@ -1,12 +1,8 @@
 import { Button } from '@/components/ui/button';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import type { ComponentProps } from 'react';
@@ -22,6 +18,7 @@ export const EmailAndPassword = ({
 } & ComponentProps<typeof Button>) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   return (
     <form
@@ -33,104 +30,80 @@ export const EmailAndPassword = ({
         });
       }}
       data-testid="password-form"
+      className="space-y-6"
     >
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="email" className="text-foreground">
-            Email address
-          </Label>
-          <div className="mt-1">
-            <InputGroup>
-              <InputGroupAddon>
-                <Mail className="h-4 w-4" />
-              </InputGroupAddon>
-              <InputGroupInput
-                id={`${view}-email`}
-                name="email"
-                type="email"
-                disabled={isLoading}
-                value={email}
-                data-strategy="email-password"
-                placeholder="placeholder@email.com"
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete={'email'}
-                required
-              />
-            </InputGroup>
-          </div>
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="password" className="text-foreground">
-            Password
-          </Label>
-          <div className="mt-1">
-            <InputGroup>
-              <InputGroupAddon>
-                <Lock className="h-4 w-4" />
-              </InputGroupAddon>
-              <InputGroupInput
-                id={`${view}-password`}
-                name="password"
-                type="password"
-                disabled={isLoading}
-                value={password}
-                placeholder="Type your password"
-                onChange={(event) => setPassword(event.target.value)}
-                autoComplete={
-                  view === 'sign-in' ? 'current-password' : 'new-password'
-                }
-                required
-              />
-            </InputGroup>
-          </div>
-        </div>
+      <div className="space-y-2">
+        <Input
+          id={`${view}-email`}
+          name="email"
+          type="email"
+          disabled={isLoading}
+          value={email}
+          data-strategy="email-password"
+          placeholder="Email"
+          onChange={(event) => setEmail(event.target.value)}
+          autoComplete={'email'}
+          required
+          className="h-12 text-base"
+        />
+      </div>
 
-        <div className="flex items-center justify-between">
-          {view === 'sign-in' ? (
-            <div className="text-sm">
-              <Link
-                href="/forgot-password"
-                className="font-medium text-muted-foreground dark:hover:text-gray-600 hover:text-foreground"
-              >
-                Forgot your password?
-              </Link>
-            </div>
-          ) : null}
-        </div>
-        <div className="space-y-2">
-          <Button disabled={isLoading} type="submit" className="w-full">
-            {isLoading ? (
-              <>
-                <Spinner className="h-4 w-4 mr-2" />
-                <span>Loading...</span>
-              </>
+      <div className="space-y-2">
+        <div className="relative">
+          <Input
+            id={`${view}-password`}
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            disabled={isLoading}
+            value={password}
+            placeholder="Password"
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete={
+              view === 'sign-in' ? 'current-password' : 'new-password'
+            }
+            required
+            className="h-12 text-base pr-12"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            tabIndex={-1}
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
             ) : (
-              <span>{view === 'sign-in' ? 'Login' : 'Sign up'}</span>
+              <Eye className="h-5 w-5" />
             )}
-          </Button>
-          <div className="w-full text-center">
-            {view === 'sign-in' ? (
-              <div className="text-sm">
-                <Link
-                  href="/sign-up"
-                  className="font-medium text-muted-foreground hover:text-foreground"
-                >
-                  Don't have an account? Sign up
-                </Link>
-              </div>
-            ) : (
-              <div className="text-sm">
-                <Link
-                  href="/login"
-                  className="font-medium text-muted-foreground hover:text-foreground"
-                >
-                  Already have an account? Log in
-                </Link>
-              </div>
-            )}
-          </div>
+          </button>
         </div>
       </div>
+
+      {view === 'sign-in' && (
+        <div>
+          <Link
+            href="/forgot-password"
+            className="text-sm text-[#4d74ff] hover:opacity-80 font-medium"
+          >
+            Forgot your password?
+          </Link>
+        </div>
+      )}
+
+      <Button 
+        disabled={isLoading || !email || !password} 
+        type="submit" 
+        className="w-full h-10 text-sm bg-[var(--pw-greyscale-300)] text-[var(--pw-greyscale-1000)] hover:bg-[var(--pw-greyscale-400)] disabled:opacity-10 disabled:cursor-not-allowed transition-all"
+      >
+        {isLoading ? (
+          <>
+            <Spinner className="h-4 w-4 mr-2" />
+            <span>Loading...</span>
+          </>
+        ) : (
+          <span>{view === 'sign-in' ? 'Log in' : 'Sign up'}</span>
+        )}
+      </Button>
     </form>
   );
 };

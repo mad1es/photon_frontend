@@ -1,26 +1,22 @@
 'use client';
-import { Email } from '@/components/Auth/Email';
 import { EmailAndPassword } from '@/components/Auth/EmailAndPassword';
 import { EmailConfirmationPendingCard } from '@/components/Auth/EmailConfirmationPendingCard';
 import { RedirectingPleaseWaitCard } from '@/components/Auth/RedirectingPleaseWaitCard';
-import { RenderProviders } from '@/components/Auth/RenderProviders';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  signInWithMagicLinkAction,
   signInWithPasswordAction,
-  signInWithProviderAction,
 } from '@/data/auth/auth';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { 
+  Globe, 
+  TrendingUp, 
+  Heart, 
+  Check, 
+  Info
+} from 'lucide-react';
+import Link from 'next/link';
 
 export function Login({
   next,
@@ -44,32 +40,6 @@ export function Login({
       router.push('/dashboard');
     }
   }
-
-  const { execute: executeMagicLink, status: magicLinkStatus } = useAction(
-    signInWithMagicLinkAction,
-    {
-      onExecute: () => {
-        toastRef.current = toast.loading('Sending magic link...');
-      },
-      onSuccess: () => {
-        toast.success('A magic link has been sent to your email!', {
-          id: toastRef.current,
-        });
-        toastRef.current = undefined;
-        setEmailSentSuccessMessage('A magic link has been sent to your email!');
-      },
-      onError: (error) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : `Send magic link failed ${String(error)}`;
-        toast.error(errorMessage, {
-          id: toastRef.current,
-        });
-        toastRef.current = undefined;
-      },
-    }
-  );
 
   const { execute: executePassword, status: passwordStatus } = useAction(
     signInWithPasswordAction,
@@ -98,62 +68,130 @@ export function Login({
     }
   );
 
-  const { execute: executeProvider, status: providerStatus } = useAction(
-    signInWithProviderAction,
-    {
-      onExecute: () => {
-        toastRef.current = toast.loading('Requesting login...');
-      },
-      onSuccess: (payload) => {
-        toast.success('Redirecting...', {
-          id: toastRef.current,
-        });
-        toastRef.current = undefined;
-        window.location.href = payload.data?.url || '/';
-      },
-      onError: () => {
-        toast.error('Failed to login', {
-          id: toastRef.current,
-        });
-        toastRef.current = undefined;
-      },
-    }
-  );
-
+  if (emailSentSuccessMessage) {
   return (
-    <div
-      data-success={emailSentSuccessMessage}
-      className="container data-success:flex items-center data-success:justify-center text-left max-w-lg mx-auto overflow-auto data-success:h-full min-h-[470px]"
-    >
-      {emailSentSuccessMessage ? (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <EmailConfirmationPendingCard
           type={'login'}
           heading={'Confirmation Link Sent'}
           message={emailSentSuccessMessage}
           resetSuccessMessage={setEmailSentSuccessMessage}
         />
-      ) : redirectInProgress ? (
+      </div>
+    );
+  }
+
+  if (redirectInProgress) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <RedirectingPleaseWaitCard
           message="Please wait while we redirect you to your dashboard."
           heading="Redirecting to Dashboard"
         />
-      ) : (
-        <div className="space-y-8 bg-background p-6 rounded-lg shadow-sm dark:border">
-          <Tabs defaultValue="password" className="md:min-w-[400px]">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="password">Password</TabsTrigger>
-              <TabsTrigger value="magic-link">Magic Link</TabsTrigger>
-              <TabsTrigger value="social-login">Social Login</TabsTrigger>
-            </TabsList>
-            <TabsContent value="password">
-              <Card className="border-none shadow-none">
-                <CardHeader className="py-6 px-0">
-                  <CardTitle>Login to NextBase</CardTitle>
-                  <CardDescription>
-                    Login with the account you used to signup.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 p-0">
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex relative overflow-hidden">
+      {/* Logo - Top Left Corner */}
+      <div className="absolute top-8 left-8 z-10 text-2xl font-bold text-white" style={{ fontFamily: "'Oceanwide Pro', sans-serif" }}>
+        photon
+      </div>
+
+      {/* Left Panel - Marketing Content */}
+      <div 
+        className="hidden lg:flex lg:w-[35%] text-white pt-8 pb-8 pr-8 pl-0 flex-col justify-between relative h-screen"
+        style={{
+          background: 'radial-gradient(circle at top right, rgba(64, 76, 184, 1) 0%, rgba(64, 76, 184, 0) 30%, rgba(27, 34, 44, 1) 100%)'
+        }}
+      >
+        <div className="space-y-12 pt-24 pl-8">
+          {/* Main Heading */}
+          <div className="space-y-4">
+            <h1 className="text-5xl leading-tight text-left" style={{ fontFamily: 'var(--font-header), serif', fontWeight: 300 }}>
+              Investing for those
+              <br />
+              <span className="text-[#4d74ff]">who take it seriously</span>
+            </h1>
+          </div>
+
+          {/* Features List */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Globe className="h-4 w-4 text-[#4d74ff] flex-shrink-0" />
+              <span className="text-sm">Multi-asset investing.</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <TrendingUp className="h-4 w-4 text-[#4d74ff] flex-shrink-0" />
+              <span className="text-sm">Industry-leading yields.</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Heart className="h-4 w-4 text-[#4d74ff] flex-shrink-0" />
+              <span className="text-sm">Trusted by millions.</span>
+            </div>
+          </div>
+
+          {/* Investment Options */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            {[
+              'Stocks',
+              'Options Trading',
+              'Treasuries',
+              'Bonds',
+              { text: 'High-Yield Cash Account', badge: '3.6% APY¹' },
+              'ETFs',
+              'Crypto',
+              { text: 'Bond Account', badge: '5.50% yield²' },
+            ].map((item, index) => {
+              const isObject = typeof item === 'object';
+              return (
+                <div key={index} className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-[#4d74ff] flex-shrink-0 mt-0.5" />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-sm">
+                      {isObject ? item.text : item}
+                    </span>
+                    {isObject && item.badge && (
+                      <span className="px-1.5 py-0.5 bg-[#4d74ff] rounded text-xs font-medium">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Disclosures */}
+        <div className="space-y-1.5 text-xs text-[var(--pw-greyscale-500)] text-center">
+          <div className="flex items-center gap-1.5">
+            <Info className="h-1 w-5" />
+          </div>
+          <p className="leading-snug">
+            All investing involves risk, including loss of principle. See disclosures for more information. 
+            ¹APY is variable and subject to change. ²This yield is the current average, annualized yield to worst (YTW) across all bonds in the Bond Account, before fees.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Panel - Login Form */}
+      <div className="w-full lg:w-[65%] flex items-center justify-center bg-background p-8 h-screen">
+        <div className="w-full max-w-md space-y-8">
+          <div className="-mt-16 text-left">
+            <h2 className="text-4xl font-bold text-foreground mb-1">Log in</h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>New to Photon?</span>
+              <Link 
+                href="/sign-up" 
+                className="text-[#4d74ff] hover:opacity-80 font-medium"
+              >
+                Create account &gt;
+              </Link>
+            </div>
+          </div>
+
                   <EmailAndPassword
                     isLoading={passwordStatus === 'executing'}
                     onSubmit={(data) => {
@@ -164,49 +202,8 @@ export function Login({
                     }}
                     view="sign-in"
                   />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="magic-link">
-              <Card className="border-none shadow-none">
-                <CardHeader className="py-6 px-0">
-                  <CardTitle>Login to NextBase</CardTitle>
-                  <CardDescription>
-                    Login with magic link we will send to your email.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 p-0">
-                  <Email
-                    onSubmit={(email) => executeMagicLink({ email, next })}
-                    isLoading={magicLinkStatus === 'executing'}
-                    view="sign-in"
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="social-login">
-              <Card className="border-none shadow-none">
-                <CardHeader className="py-6 px-0">
-                  <CardTitle>Login to NextBase</CardTitle>
-                  <CardDescription>
-                    Login with your social account.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 p-0">
-                  <RenderProviders
-                    providers={['google', 'github', 'twitter']}
-                    isLoading={providerStatus === 'executing'}
-                    onProviderLoginRequested={(
-                      provider: 'google' | 'github' | 'twitter'
-                    ) => executeProvider({ provider, next })}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
         </div>
-      )}
+      </div>
     </div>
   );
 }

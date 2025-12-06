@@ -10,6 +10,16 @@
 @plugin "@tailwindcss/forms";
 @import 'tw-animate-css';
 
+@font-face {
+  font-family: 'Oceanwide Pro';
+  src: url('/fonts/OceanwidePro-Medium.woff2') format('woff2'),
+       url('/fonts/OceanwidePro-Medium.woff') format('woff'),
+       url('/fonts/OceanwidePro-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Public.com exact color scheme */
   --card: #fff;

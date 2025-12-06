@@ -40,7 +40,7 @@ export default function LandingPage() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-foreground">
+              <span className="text-xl font-bold text-foreground" style={{ fontFamily: "'Oceanwide Pro', sans-serif" }}>
                 photon
               </span>
             </div>
@@ -76,7 +76,7 @@ export default function LandingPage() {
                   <Brain className="h-3.5 w-3.5 text-primary" />
                   <span>AI-Powered Multi-Agent Trading System</span>
                 </Badge>
-                <T.H1 className="text-5xl font-bold leading-tight tracking-tight sm:text-6xl md:text-7xl lg:text-8xl text-balance">
+                <T.H1 className="text-5xl fo leading-tight tracking-tight sm:text-6xl md:text-7xl lg:text-8xl text-balance">
                   AI-Powered Trading.
                   <br />
                   <span className="text-primary">

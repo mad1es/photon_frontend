@@ -4,25 +4,19 @@ import { useAction } from 'next-safe-action/hooks';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { Email } from '@/components/Auth/Email';
 import { EmailAndPassword } from '@/components/Auth/EmailAndPassword';
 import { EmailConfirmationPendingCard } from '@/components/Auth/EmailConfirmationPendingCard';
-import { RenderProviders } from '@/components/Auth/RenderProviders';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-import {
-  signInWithMagicLinkAction,
-  signInWithProviderAction,
   signUpAction,
 } from '@/data/auth/auth';
-import type { AuthProvider } from '@/types';
+import { 
+  Globe, 
+  TrendingUp, 
+  Heart, 
+  Check, 
+  Info
+} from 'lucide-react';
+import Link from 'next/link';
 
 interface SignUpProps {
   next?: string;
@@ -31,27 +25,6 @@ interface SignUpProps {
 export function SignUp({ next }: SignUpProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const toastRef = useRef<string | number | undefined>(undefined);
-
-  const { execute: executeMagicLink, status: magicLinkStatus } = useAction(
-    signInWithMagicLinkAction,
-    {
-      onExecute: () => {
-        toastRef.current = toast.loading('Sending magic link...');
-      },
-      onSuccess: () => {
-        toast.success('A magic link has been sent to your email!', {
-          id: toastRef.current,
-        });
-        toastRef.current = undefined;
-        setSuccessMessage('A magic link has been sent to your email!');
-      },
-      onError: ({ error }) => {
-        const errorMessage = error.serverError ?? 'Failed to send magic link';
-        toast.error(errorMessage, { id: toastRef.current });
-        toastRef.current = undefined;
-      },
-    }
-  );
 
   const { execute: executeSignUp, status: signUpStatus } = useAction(
     signUpAction,
@@ -72,109 +45,128 @@ export function SignUp({ next }: SignUpProps) {
     }
   );
 
-  const { execute: executeProvider, status: providerStatus } = useAction(
-    signInWithProviderAction,
-    {
-      onExecute: () => {
-        toastRef.current = toast.loading('Requesting login...');
-      },
-      onSuccess: ({ data }) => {
-        toast.success('Redirecting...', { id: toastRef.current });
-        toastRef.current = undefined;
-        if (data?.url) {
-          window.location.href = data.url;
-        }
-      },
-      onError: ({ error }) => {
-        const errorMessage = error.serverError ?? 'Failed to login';
-        toast.error(errorMessage, { id: toastRef.current });
-        toastRef.current = undefined;
-      },
-    }
-  );
-
-  return (
-    <div
-      data-success={successMessage}
-      className="container data-success:flex items-center data-success:justify-center text-left max-w-lg mx-auto overflow-auto data-success:h-full min-h-[470px]"
-    >
-      {successMessage ? (
+  if (successMessage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <EmailConfirmationPendingCard
           type="sign-up"
           heading="Confirmation Link Sent"
           message={successMessage}
           resetSuccessMessage={setSuccessMessage}
         />
-      ) : (
-        <div className="space-y-8 bg-background p-6 rounded-lg shadow-sm dark:border">
-          <Tabs defaultValue="password" className="md:min-w-[400px]">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="password">Password</TabsTrigger>
-              <TabsTrigger value="magic-link">Magic Link</TabsTrigger>
-              <TabsTrigger value="social-login">Social Login</TabsTrigger>
-            </TabsList>
+      </div>
+    );
+  }
 
-            <TabsContent value="password">
-              <Card className="border-none shadow-none">
-                <CardHeader className="py-6 px-0">
-                  <CardTitle>Register to NextBase</CardTitle>
-                  <CardDescription>
-                    Create an account with your email and password
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 p-0">
-                  <EmailAndPassword
-                    isLoading={signUpStatus === 'executing'}
-                    onSubmit={(data) => {
-                      executeSignUp({ ...data, next });
-                    }}
-                    view="sign-up"
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="magic-link">
-              <Card className="border-none shadow-none">
-                <CardHeader className="py-6 px-0">
-                  <CardTitle>Register to NextBase</CardTitle>
-                  <CardDescription>
-                    Create an account with magic link we will send to your email
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 p-0">
-                  <Email
-                    onSubmit={(email) => executeMagicLink({ email, next })}
-                    isLoading={magicLinkStatus === 'executing'}
-                    view="sign-up"
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="social-login">
-              <Card className="border-none shadow-none">
-                <CardHeader className="py-6 px-0">
-                  <CardTitle>Register to NextBase</CardTitle>
-                  <CardDescription>
-                    Register with your social account
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 p-0">
-                  <RenderProviders
-                    providers={['google', 'github', 'twitter']}
-                    isLoading={providerStatus === 'executing'}
-                    onProviderLoginRequested={(
-                      provider: Extract<
-                        AuthProvider,
-                        'google' | 'github' | 'twitter'
-                      >
-                    ) => executeProvider({ provider, next })}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+  return (
+    <div className="h-screen flex relative overflow-hidden">
+      {/* Logo - Top Left Corner */}
+      <div className="absolute top-8 left-8 z-10 text-2xl font-bold text-white" style={{ fontFamily: "'Oceanwide Pro', sans-serif" }}>
+        photon
+      </div>
+
+      {/* Left Panel - Marketing Content */}
+      <div 
+        className="hidden lg:flex lg:w-[35%] text-white pt-8 pb-8 pr-8 pl-0 flex-col justify-between relative h-screen"
+        style={{
+          background: 'radial-gradient(circle at top right, rgba(64, 76, 184, 1) 0%, rgba(64, 76, 184, 0) 30%, rgba(27, 34, 44, 1) 100%)'
+        }}
+      >
+        <div className="space-y-12 pt-24 pl-8">
+          {/* Main Heading */}
+          <div className="space-y-4">
+            <h1 className="text-5xl leading-tight text-left" style={{ fontFamily: 'var(--font-header), serif', fontWeight: 300 }}>
+              Investing for those
+              <br />
+              <span className="text-[#4d74ff]">who take it seriously</span>
+            </h1>
+          </div>
+
+          {/* Features List */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Globe className="h-4 w-4 text-[#4d74ff] flex-shrink-0" />
+              <span className="text-sm">Multi-asset investing.</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <TrendingUp className="h-4 w-4 text-[#4d74ff] flex-shrink-0" />
+              <span className="text-sm">Industry-leading yields.</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Heart className="h-4 w-4 text-[#4d74ff] flex-shrink-0" />
+              <span className="text-sm">Trusted by millions.</span>
+            </div>
+          </div>
+
+          {/* Investment Options */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            {[
+              'Stocks',
+              'Options Trading',
+              'Treasuries',
+              'Bonds',
+              { text: 'High-Yield Cash Account', badge: '3.6% APY¹' },
+              'ETFs',
+              'Crypto',
+              { text: 'Bond Account', badge: '5.50% yield²' },
+            ].map((item, index) => {
+              const isObject = typeof item === 'object';
+              return (
+                <div key={index} className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-[#4d74ff] flex-shrink-0 mt-0.5" />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-sm">
+                      {isObject ? item.text : item}
+                    </span>
+                    {isObject && item.badge && (
+                      <span className="px-1.5 py-0.5 bg-[#4d74ff] rounded text-xs font-medium">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      )}
+
+        {/* Disclosures */}
+        <div className="space-y-1.5 text-xs text-[var(--pw-greyscale-500)] text-center">
+          <div className="flex items-center gap-1.5">
+            <Info className="h-1 w-5" />
+          </div>
+          <p className="leading-snug">
+            All investing involves risk, including loss of principle. See disclosures for more information. 
+            ¹APY is variable and subject to change. ²This yield is the current average, annualized yield to worst (YTW) across all bonds in the Bond Account, before fees.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Panel - Sign Up Form */}
+      <div className="w-full lg:w-[65%] flex items-center justify-center bg-background p-8 h-screen">
+        <div className="w-full max-w-md space-y-8">
+          <div className="-mt-16 text-left">
+            <h2 className="text-4xl font-bold text-foreground mb-1">Create account</h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Already have an account?</span>
+              <Link 
+                href="/login" 
+                className="text-[#4d74ff] hover:opacity-80 font-medium"
+              >
+                Log in &gt;
+              </Link>
+            </div>
+          </div>
+
+          <EmailAndPassword
+            isLoading={signUpStatus === 'executing'}
+            onSubmit={(data) => {
+              executeSignUp({ ...data, next });
+            }}
+            view="sign-up"
+          />
+        </div>
+      </div>
     </div>
   );
 }
