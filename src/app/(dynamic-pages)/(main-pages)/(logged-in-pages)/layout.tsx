@@ -26,6 +26,11 @@ export default async function Layout({
   children: ReactNode;
   heading: ReactNode;
 }) {
+  const isLoggedIn = await getCachedIsUserLoggedIn();
+  if (!isLoggedIn) {
+    redirect('/login');
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
