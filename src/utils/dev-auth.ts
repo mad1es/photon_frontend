@@ -6,13 +6,10 @@ const DEV_USER_ID = 'dev-user-id';
 /**
  * Проверяет, включен ли dev режим аутентификации
  * Синхронная функция, не требует 'use server'
+ * Теперь всегда false, так как используем Django API
  */
 export function isDevAuthEnabled(): boolean {
-  return (
-    process.env.NODE_ENV === 'development' &&
-    (!process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      process.env.NEXT_PUBLIC_SUPABASE_URL === 'your-supabase-url-here')
-  );
+  return false;
 }
 
 /**

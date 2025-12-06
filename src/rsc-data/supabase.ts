@@ -1,142 +1,126 @@
-import { createSupabaseClient } from '@/supabase-clients/server';
-import { getDevUserId, hasDevSession, isDevAuthEnabled } from '@/utils/dev-auth';
+import { serverApiClient } from '@/lib/api-client-server';
+import { getServerAccessToken, getServerRefreshToken } from '@/utils/jwt-tokens';
 import { cache } from 'react';
 
-// Only meant to be used in protected pages
-// This makes an extra call to the server to verify the user is still logged in
-// Use sparingly
+export interface User {
+  id: string;
+  email: string;
+  full_name?: string;
+  date_joined?: string;
+}
+
 export const getCachedLoggedInVerifiedSupabaseUser = cache(async () => {
-  if (isDevAuthEnabled()) {
-    const hasSession = await hasDevSession();
-    if (hasSession) {
-      return {
-        user: {
-          id: await getDevUserId() || 'dev-user-id',
-          email: 'dev@example.com',
-        },
-      };
-    }
+  const token = await getServerAccessToken();
+  if (!token) {
     throw new Error('No user found');
-  }
-
-  const supabase = await createSupabaseClient();
-  if (!supabase) {
-    // Если Supabase не настроен, возвращаем дефолтного пользователя
-    return {
-      user: {
-        id: 'default-user-id',
-        email: 'user@example.com',
-      },
-    };
-  }
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error) {
-    throw error;
-  }
-  return data;
-});
-
-// Only meant to be used in protected pages
-// This doesn't verify the token with the server, it only validates the stored token
-export const getCachedLoggedInSupabaseUser = cache(async () => {
-  if (isDevAuthEnabled()) {
-    const hasSession = await hasDevSession();
-    if (hasSession) {
-      return {
-        id: await getDevUserId() || 'dev-user-id',
-        email: 'dev@example.com',
-      } as any;
-    }
-    throw new Error('No user found');
-  }
-
-  const supabase = await createSupabaseClient();
-  if (!supabase) {
-    // Если Supabase не настроен, возвращаем дефолтного пользователя
-    return {
-      id: 'default-user-id',
-      email: 'user@example.com',
-    } as any;
-  }
-
-  const { data, error } = await supabase.auth.getSession();
-  if (error) {
-    throw error;
-  }
-  if (!data.session?.user) {
-    throw new Error('No user found');
-  }
-  return data.session.user;
-});
-
-export const getCachedLoggedInUserClaims = cache(async () => {
-  if (isDevAuthEnabled()) {
-    const userId = await getDevUserId();
-    if (userId) {
-      return {
-        sub: userId,
-        email: 'dev@example.com',
-      };
-    }
-    throw new Error('No claims found');
-  }
-
-  const supabase = await createSupabaseClient();
-  if (!supabase) {
-    // Если Supabase не настроен, возвращаем дефолтные claims
-    return {
-      sub: 'default-user-id',
-      email: 'user@example.com',
-    };
-  }
-
-  const { data, error } = await supabase.auth.getClaims();
-  if (error) {
-    throw error;
-  }
-  if (!data?.claims) {
-    throw new Error('No claims found');
-  }
-  return data.claims;
-});
-
-
-export const getCachedIsUserLoggedIn = cache(async () => {
-  if (isDevAuthEnabled()) {
-    return await hasDevSession();
-  }
-
-  const supabase = await createSupabaseClient();
-  if (!supabase) {
-    // Если Supabase не настроен, считаем что пользователь авторизован
-    return true;
   }
 
   try {
-    const { data, error } = await supabase.auth.getClaims();
-    if (error || !data?.claims) {
-      return false;
+    const user = await serverApiClient.getCurrentUser();
+    if (!user) {
+      throw new Error('No user found');
     }
-    console.log('claims', data.claims);
-    return data.claims.sub !== null;
+    return {
+      user: {
+        id: String(user.id),
+        email: user.email,
+        full_name: user.full_name,
+      },
+    };
   } catch (error) {
-    // Если произошла ошибка, считаем что пользователь не авторизован
+    const refreshToken = await getServerRefreshToken();
+    if (refreshToken) {
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          const { setServerAuthTokens } = await import('@/utils/jwt-tokens');
+          await setServerAuthTokens(refreshData.access, refreshToken);
+          const retryUser = await serverApiClient.getCurrentUser();
+          if (retryUser) {
+            return {
+              user: {
+                id: String(retryUser.id),
+                email: retryUser.email,
+                full_name: retryUser.full_name,
+              },
+            };
+          }
+        }
+      } catch {
+        throw new Error('No user found');
+      }
+    }
+    throw new Error('No user found');
+  }
+});
+
+export const getCachedLoggedInSupabaseUser = cache(async () => {
+  const token = await getServerAccessToken();
+  if (!token) {
+    throw new Error('No user found');
+  }
+
+  try {
+    const user = await serverApiClient.getCurrentUser();
+    if (!user) {
+      throw new Error('No user found');
+    }
+    return {
+      id: String(user.id),
+      email: user.email,
+      full_name: user.full_name,
+    } as any;
+  } catch {
+    throw new Error('No user found');
+  }
+});
+
+export const getCachedLoggedInUserClaims = cache(async () => {
+  const token = await getServerAccessToken();
+  if (!token) {
+    throw new Error('No claims found');
+  }
+
+  try {
+    const user = await serverApiClient.getCurrentUser();
+    if (!user) {
+      throw new Error('No claims found');
+    }
+    return {
+      sub: String(user.id),
+      email: user.email,
+    };
+  } catch {
+    throw new Error('No claims found');
+  }
+});
+
+export const getCachedIsUserLoggedIn = cache(async () => {
+  const token = await getServerAccessToken();
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const user = await serverApiClient.getCurrentUser();
+    return user !== null;
+  } catch {
     return false;
   }
 });
 
 export const getCachedLoggedInUserId = cache(async () => {
-  if (isDevAuthEnabled()) {
-    const userId = await getDevUserId();
-    return userId || 'dev-user-id';
-  }
-
   try {
     const claims = await getCachedLoggedInUserClaims();
     return claims.sub;
   } catch (error) {
-    // Если произошла ошибка, возвращаем дефолтный ID
-    return 'default-user-id';
+    return null;
   }
 });

@@ -39,7 +39,7 @@ async function SidebarHeaderContent() {
 
 async function SidebarContentWrapper() {
   const { user } = await getCachedLoggedInVerifiedSupabaseUser();
-  return <AppSidebarContent user={user} />
+  return <AppSidebarContent user={user as any} />
 }
 
 

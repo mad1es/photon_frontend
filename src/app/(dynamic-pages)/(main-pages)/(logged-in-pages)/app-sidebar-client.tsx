@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar";
 import { signOutAction } from "@/data/auth/sign-out";
-import { User } from "@supabase/supabase-js";
+import { User } from "@/rsc-data/supabase";
 import { ChevronUp, Home, LogOut, Settings, Wallet, Users, BarChart3, Cog } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -57,7 +57,7 @@ export function AppSidebarContent({ user }: { user: User }) {
   }
 
   const userEmail = user?.email || 'user@example.com';
-  const userName = user?.user_metadata?.name || user.email?.split('@')[0];
+  const userName = (user as any)?.full_name || user.email?.split('@')[0] || 'User';
   const userInitials = userName
     .split(' ')
     .map((n) => n[0])

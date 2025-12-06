@@ -1,6 +1,5 @@
 'use server';
 import { authActionClient } from '@/lib/safe-action';
-import { createSupabaseClient } from '@/supabase-clients/server';
 import { z } from 'zod';
 
 const updatePasswordSchema = z.object({
@@ -10,12 +9,34 @@ const updatePasswordSchema = z.object({
 export const updatePasswordAction = authActionClient
   .schema(updatePasswordSchema)
   .action(async ({ parsedInput: { password } }) => {
-    const supabaseClient = await createSupabaseClient();
-    const { error } = await supabaseClient.auth.updateUser({
-      password,
-    });
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
+    const { getServerAccessToken } = await import('@/utils/jwt-tokens');
+    
+    const token = await getServerAccessToken();
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
 
-    if (error) {
-      throw new Error(error.message);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/password-change/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          detail: `HTTP error! status: ${response.status}`,
+        }));
+        throw new Error(errorData.detail || errorData.message || 'Failed to update password');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to update password');
     }
   });
