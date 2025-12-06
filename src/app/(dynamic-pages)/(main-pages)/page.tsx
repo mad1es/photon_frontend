@@ -70,20 +70,14 @@ export default function LandingPage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-transparent to-transparent"></div>
         <div className="container px-4 md:px-6 mx-auto">
           <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
-            <div className="flex flex-col items-center gap-8 text-center lg:mt-12">
-              <div className="flex flex-col items-center gap-6">
-                <Badge variant="outline" className="inline-flex items-center gap-2 px-4 py-1.5">
-                  <Brain className="h-3.5 w-3.5 text-primary" />
-                  <span>AI-Powered Multi-Agent Trading System</span>
-                </Badge>
-                <T.H1 className="text-5xl fo leading-tight tracking-tight sm:text-6xl md:text-7xl lg:text-8xl text-balance">
+            <div className="flex flex-col gap-8 lg:mt-12">
+              <div className="flex flex-col gap-6">
+                <h1 className="text-6xl leading-tight text-left" style={{ fontFamily: 'var(--font-header), serif', fontWeight: 300 }}>
                   AI-Powered Trading.
                   <br />
-                  <span className="text-primary">
-                    Human-Level Control.
-                  </span>
-                </T.H1>
-                <T.P className="mx-auto max-w-[700px] text-lg text-muted-foreground md:text-xl">
+                  <span className="text-[#4d74ff]">Human-Level Control.</span>
+                </h1>
+                <T.P className="max-w-[700px] text-left text-lg text-muted-foreground md:text-xl">
                   Three coordinated AI agents work 24/7 to monitor markets, make decisions, and execute trades—giving you automated intelligence with complete transparency.
                 </T.P>
               </div>
@@ -108,7 +102,6 @@ export default function LandingPage() {
           {/* Agent Communication Visualization */}
           <div className="mt-16 md:mt-28">
             <div className="relative w-full max-w-6xl mx-auto">
-              <div className="absolute -inset-1 bg-gradient-primary rounded-2xl blur-xl opacity-20"></div>
               <Card className="relative card-glass">
                 <CardHeader>
                   <CardTitle className="text-center">Live Agent Communication</CardTitle>
@@ -118,7 +111,7 @@ export default function LandingPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center gap-4 p-4 rounded-lg bg-card/50 border border-border/50">
+                    <div className="flex items-center gap-4 p-4 rounded-lg bg-black border-[0.3px] border-[#4a4a4a]">
                       <div className="flex-shrink-0">
                         <div className="h-10 w-10 rounded-full bg-gradient-blue flex items-center justify-center">
                           <BarChart3 className="h-5 w-5 text-white" />
@@ -132,7 +125,7 @@ export default function LandingPage() {
                       </div>
                       <div className="text-xs text-muted-foreground">2s ago</div>
                     </div>
-                    <div className="flex items-center gap-4 p-4 rounded-lg bg-card/50 border border-border/50">
+                    <div className="flex items-center gap-4 p-4 rounded-lg bg-black border-[0.5px] border-[#4a4a4a]">
                       <div className="flex-shrink-0">
                         <div className="h-10 w-10 rounded-full bg-gradient-yellow flex items-center justify-center">
                           <Brain className="h-5 w-5 text-white" />
@@ -146,7 +139,7 @@ export default function LandingPage() {
                       </div>
                       <div className="text-xs text-muted-foreground">1s ago</div>
                     </div>
-                    <div className="flex items-center gap-4 p-4 rounded-lg bg-card/50 border border-border/50">
+                    <div className="flex items-center gap-4 p-4 rounded-lg bg-black border-[0.5px] border-[#4a4a4a]">
                       <div className="flex-shrink-0">
                         <div className="h-10 w-10 rounded-full bg-gradient-green flex items-center justify-center">
                           <Zap className="h-5 w-5 text-white" />
@@ -169,68 +162,78 @@ export default function LandingPage() {
       </section>
 
       {/* Problem-Solution Section */}
-      <section id="problem-solution" className="w-full py-20 md:py-32 bg-card/30">
-        <div className="container px-4 md:px-6 mx-auto">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-            <div className="flex flex-col gap-6">
-              <Badge variant="outline" className="w-fit">
-                The Problem
-              </Badge>
-              <T.H2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
-                Manual trading is slow, emotional, and error-prone
-              </T.H2>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <div className="h-2 w-2 rounded-full bg-destructive"></div>
+      <section id="problem-solution" className="relative w-full py-20 md:py-32 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/images/active-trading-bg-crypto-1440.webp)',
+          }}
+        />
+        <div className="container relative px-4 md:px-6 mx-auto">
+          <div className="max-w-6xl mx-auto">
+            <div className="backdrop-blur-2xl bg-background/5 border border-border/50 rounded-lg p-8 md:p-12 lg:p-16">
+              <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+                <div className="flex flex-col gap-6">
+                  <Badge variant="outline" className="w-fit">
+                    The Problem
+                  </Badge>
+                  <T.H2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+                    Manual trading is slow, emotional, and error-prone
+                  </T.H2>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="h-2 w-2 rounded-full bg-destructive"></div>
+                      </div>
+                      <T.P className="text-muted-foreground">
+                        Human traders miss opportunities due to sleep, emotions, and reaction time
+                      </T.P>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="h-2 w-2 rounded-full bg-destructive"></div>
+                      </div>
+                      <T.P className="text-muted-foreground">
+                        Manual analysis is time-consuming and prone to cognitive biases
+                      </T.P>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="h-2 w-2 rounded-full bg-destructive"></div>
+                      </div>
+                      <T.P className="text-muted-foreground">
+                        Execution delays can cost significant profits in volatile markets
+                      </T.P>
+                    </div>
                   </div>
-                  <T.P className="text-muted-foreground">
-                    Human traders miss opportunities due to sleep, emotions, and reaction time
-                  </T.P>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <div className="h-2 w-2 rounded-full bg-destructive"></div>
+                <div className="flex flex-col gap-6">
+                  <Badge variant="outline" className="w-fit bg-gradient-green/20 border-green-500/50">
+                    Our Solution
+                  </Badge>
+                  <T.H2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+                    Three coordinated AI agents work 24/7
+                  </T.H2>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <T.P className="text-muted-foreground">
+                        Market Monitor continuously tracks 15+ exchanges and 2,450+ data points per minute
+                      </T.P>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <T.P className="text-muted-foreground">
+                        Decision Maker analyzes data with 87% average confidence, free from emotions
+                      </T.P>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <T.P className="text-muted-foreground">
+                        Executor places trades in 0.2 seconds with zero slippage
+                      </T.P>
+                    </div>
                   </div>
-                  <T.P className="text-muted-foreground">
-                    Manual analysis is time-consuming and prone to cognitive biases
-                  </T.P>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <div className="h-2 w-2 rounded-full bg-destructive"></div>
-                  </div>
-                  <T.P className="text-muted-foreground">
-                    Execution delays can cost significant profits in volatile markets
-                  </T.P>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-6">
-              <Badge variant="outline" className="w-fit bg-gradient-green/20 border-green-500/50">
-                Our Solution
-              </Badge>
-              <T.H2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
-                Three coordinated AI agents work 24/7
-              </T.H2>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <T.P className="text-muted-foreground">
-                    Market Monitor continuously tracks 15+ exchanges and 2,450+ data points per minute
-                  </T.P>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <T.P className="text-muted-foreground">
-                    Decision Maker analyzes data with 87% average confidence, free from emotions
-                  </T.P>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <T.P className="text-muted-foreground">
-                    Executor places trades in 0.2 seconds with zero slippage
-                  </T.P>
                 </div>
               </div>
             </div>
@@ -330,7 +333,7 @@ export default function LandingPage() {
                       <p className="text-sm font-medium">Executor</p>
                     </div>
                   </div>
-                  <div className="mt-4 p-4 rounded-lg bg-card/50 border border-border/50">
+                  <div className="mt-4 p-4 rounded-lg bg-black border-[0.3px] border-[#4a4a4a]">
                     <p className="text-xs text-muted-foreground text-center">
                       Average latency: 0.5 seconds | Communication efficiency: 98%
                     </p>
