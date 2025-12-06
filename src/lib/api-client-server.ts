@@ -54,9 +54,10 @@ class ServerApiClient {
             if (refreshResponse.ok) {
               const refreshData = await refreshResponse.json();
               cookieStore.set('access_token', refreshData.access, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                httpOnly: false,
+                secure: false,
                 sameSite: 'lax',
+                path: '/',
                 maxAge: 60 * 30,
               });
               headers['Authorization'] = `Bearer ${refreshData.access}`;
