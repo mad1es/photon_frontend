@@ -48,9 +48,9 @@ export function Login({
         toastRef.current = toast.loading('Logging in...');
       },
       onSuccess: ({ data }) => {
-        if (data?.result?.access && data?.result?.refresh) {
-          localStorage.setItem('access_token', data.result.access);
-          localStorage.setItem('refresh_token', data.result.refresh);
+        if (data?.access && data?.refresh) {
+          localStorage.setItem('access_token', data.access);
+          localStorage.setItem('refresh_token', data.refresh);
         }
         toast.success('Logged in!', {
           id: toastRef.current,

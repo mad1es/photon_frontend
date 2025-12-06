@@ -150,3 +150,42 @@ export const refreshTokenAction = actionClient.action(async () => {
     throw new Error('Token refresh failed');
   }
 });
+
+const resetPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+/**
+ * Sends a password reset link to the user's email address.
+ * @param {Object} params - The parameters for password reset.
+ * @param {string} params.email - The user's email address.
+ * @returns {Promise<Object>} Success confirmation.
+ * @throws {Error} If there's an error sending the password reset link.
+ */
+export const resetPasswordAction = actionClient
+  .schema(resetPasswordSchema)
+  .action(async ({ parsedInput: { email } }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/password-reset/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          detail: `HTTP error! status: ${response.status}`,
+        }));
+        throw new Error(errorData.detail || errorData.message || 'Failed to send password reset link');
+      }
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to send password reset link');
+    }
+  });
