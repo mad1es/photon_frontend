@@ -29,16 +29,16 @@ export default async function Layout({
   return (
     <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
       <AuthGuard>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset className="flex flex-col min-h-screen">
-            <DashboardHeader heading={heading} />
-            <div className="flex-1">
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset className="flex flex-col min-h-screen">
+        <DashboardHeader heading={heading} />
+        <div className="flex-1">
               {children}
-            </div>
-            <Footer />
-          </SidebarInset>
-        </SidebarProvider>
+        </div>
+        <Footer />
+      </SidebarInset>
+    </SidebarProvider>
       </AuthGuard>
     </Suspense>
   );

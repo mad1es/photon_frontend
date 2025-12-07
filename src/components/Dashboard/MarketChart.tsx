@@ -30,7 +30,7 @@ export function MarketChart({ data, symbol, currentPrice }: MarketChartProps) {
   };
 
   return (
-    <Card>
+    <Card className="card-glass hover-lift">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>
@@ -43,11 +43,11 @@ export function MarketChart({ data, symbol, currentPrice }: MarketChartProps) {
             </span>
           </CardTitle>
           <Tabs value={timeframe} onValueChange={(v) => setTimeframe(v as typeof timeframe)}>
-            <TabsList>
-              <TabsTrigger value="15m">15m</TabsTrigger>
-              <TabsTrigger value="1h">1h</TabsTrigger>
-              <TabsTrigger value="4h">4h</TabsTrigger>
-              <TabsTrigger value="1d">1d</TabsTrigger>
+            <TabsList className="bg-background/50 border border-border/50">
+              <TabsTrigger value="15m" className="data-[state=active]:bg-primary/10">15m</TabsTrigger>
+              <TabsTrigger value="1h" className="data-[state=active]:bg-primary/10">1h</TabsTrigger>
+              <TabsTrigger value="4h" className="data-[state=active]:bg-primary/10">4h</TabsTrigger>
+              <TabsTrigger value="1d" className="data-[state=active]:bg-primary/10">1d</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -56,27 +56,27 @@ export function MarketChart({ data, symbol, currentPrice }: MarketChartProps) {
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
               <XAxis
                 dataKey="time"
-                tick={{ fill: 'currentColor' }}
+                tick={{ fill: 'currentColor', fontSize: 12 }}
                 tickLine={{ stroke: 'currentColor' }}
-                axisLine={{ stroke: 'currentColor' }}
+                axisLine={{ stroke: 'currentColor', strokeWidth: 0.5 }}
               />
               <YAxis
-                tick={{ fill: 'currentColor' }}
+                tick={{ fill: 'currentColor', fontSize: 12 }}
                 tickLine={{ stroke: 'currentColor' }}
-                axisLine={{ stroke: 'currentColor' }}
+                axisLine={{ stroke: 'currentColor', strokeWidth: 0.5 }}
                 domain={['dataMin - 1', 'dataMax + 1']}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Line
                 type="monotone"
                 dataKey="price"
-                stroke="var(--color-price)"
+                stroke="hsl(var(--chart-1))"
                 strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 4 }}
+                activeDot={{ r: 4, fill: 'hsl(var(--chart-1))' }}
               />
             </LineChart>
           </ResponsiveContainer>

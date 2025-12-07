@@ -8,6 +8,7 @@ import { formatCurrency } from '@/lib/utils';
 interface PnLCurveProps {
   initialBalance: number;
   currentBalance: number;
+  pnlData?: Array<{ date: string; pnl: number }>;
 }
 
 interface PnLDataPoint {
@@ -16,8 +17,23 @@ interface PnLDataPoint {
   date: string;
 }
 
-export function PnLCurve({ initialBalance, currentBalance }: PnLCurveProps) {
+export function PnLCurve({ initialBalance, currentBalance, pnlData }: PnLCurveProps) {
   const generatePnLData = (): PnLDataPoint[] => {
+    if (pnlData && pnlData.length > 0) {
+      let cumulativePnL = 0;
+      return pnlData.map((point, index) => {
+        cumulativePnL += point.pnl;
+        return {
+          day: index,
+          balance: initialBalance + cumulativePnL,
+          date: new Date(point.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          }),
+        };
+      });
+    }
+
     const data: PnLDataPoint[] = [];
     const days = 30;
     const startBalance = initialBalance;

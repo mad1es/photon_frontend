@@ -11,18 +11,18 @@ interface StatisticsTableProps {
 
 export function StatisticsTable({ metrics }: StatisticsTableProps) {
   const stats = [
-    { label: 'Total Trades', value: metrics.totalTrades.toString() },
-    { label: 'Winning Trades', value: metrics.winningTrades.toString() },
-    { label: 'Losing Trades', value: metrics.losingTrades.toString() },
-    { label: 'Win Rate', value: `${metrics.winRate.toFixed(1)}%` },
-    { label: 'Avg Win', value: formatCurrency(metrics.avgWin) },
-    { label: 'Avg Loss', value: formatCurrency(metrics.avgLoss) },
-    { label: 'Win/Loss Ratio', value: `${metrics.winLossRatio.toFixed(2)}:1` },
-    { label: 'Profit Factor', value: metrics.profitFactor.toFixed(2) },
-    { label: 'Sharpe Ratio', value: metrics.sharpeRatio.toFixed(2) },
-    { label: 'Max Drawdown', value: formatCurrency(metrics.maxDrawdown) },
-    { label: 'Total Return', value: formatCurrency(metrics.totalReturn) },
-    { label: 'Return %', value: `+${metrics.returnPercent.toFixed(1)}%` },
+    { label: 'Total Trades', value: (metrics.totalTrades || 0).toString() },
+    { label: 'Winning Trades', value: (metrics.winningTrades || 0).toString() },
+    { label: 'Losing Trades', value: (metrics.losingTrades || 0).toString() },
+    { label: 'Win Rate', value: `${(metrics.winRate || 0).toFixed(1)}%` },
+    { label: 'Avg Win', value: formatCurrency(metrics.avgWin || 0) },
+    { label: 'Avg Loss', value: formatCurrency(metrics.avgLoss || 0) },
+    { label: 'Win/Loss Ratio', value: `${(metrics.winLossRatio || 0).toFixed(2)}:1` },
+    { label: 'Profit Factor', value: (metrics.profitFactor || 0).toFixed(2) },
+    { label: 'Sharpe Ratio', value: (metrics.sharpeRatio || 0).toFixed(2) },
+    { label: 'Max Drawdown', value: formatCurrency(metrics.maxDrawdown || 0) },
+    { label: 'Total Return', value: formatCurrency(metrics.totalReturn || 0) },
+    { label: 'Return %', value: `${(metrics.returnPercent || 0) >= 0 ? '+' : ''}${(metrics.returnPercent || 0).toFixed(1)}%` },
   ];
 
   return (

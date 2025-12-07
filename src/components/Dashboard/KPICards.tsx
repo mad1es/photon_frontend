@@ -15,19 +15,21 @@ interface KPICardProps {
 
 function KPICard({ icon: Icon, label, value, change, changeType = 'neutral', className }: KPICardProps) {
   return (
-    <Card className={className}>
+    <Card className={cn('card-glass hover-lift', className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{label}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
+        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Icon className="h-4 w-4 text-primary" />
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-2xl font-bold tracking-tight">{value}</div>
         {change && (
           <p
             className={cn(
-              'text-xs mt-1',
-              changeType === 'positive' && 'text-green-600 dark:text-green-400',
-              changeType === 'negative' && 'text-red-600 dark:text-red-400',
+              'text-xs mt-1.5',
+              changeType === 'positive' && 'text-green-400',
+              changeType === 'negative' && 'text-red-400',
               changeType === 'neutral' && 'text-muted-foreground'
             )}
           >
@@ -59,20 +61,27 @@ export function KPICards({ balance, todayPnL, winRate, agentsStatus }: KPICardsP
     return `${value.toFixed(1)}%`;
   };
 
+  const initialBalance = 10000;
+  const balanceChange = balance - initialBalance;
+  const balanceChangePercent = (balanceChange / initialBalance) * 100;
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <KPICard
         icon={Wallet}
         label="Portfolio Balance"
         value={formatCurrency(balance)}
-        change={`+${formatCurrency(balance - 10000)} (+${((balance - 10000) / 10000 * 100).toFixed(2)}%)`}
-        changeType="positive"
+        change={
+          balanceChange !== 0
+            ? `${balanceChange >= 0 ? '+' : ''}${formatCurrency(balanceChange)} (${balanceChangePercent >= 0 ? '+' : ''}${balanceChangePercent.toFixed(2)}%)`
+            : undefined
+        }
+        changeType={balanceChange >= 0 ? 'positive' : balanceChange < 0 ? 'negative' : 'neutral'}
       />
       <KPICard
         icon={TrendingUp}
         label="Today's P&L"
         value={formatCurrency(todayPnL)}
-        change="12 trades"
         changeType={todayPnL >= 0 ? 'positive' : 'negative'}
       />
       <KPICard
@@ -85,7 +94,6 @@ export function KPICards({ balance, todayPnL, winRate, agentsStatus }: KPICardsP
         icon={Zap}
         label="Agents Status"
         value={agentsStatus}
-        change="3 active"
         changeType="positive"
       />
     </div>

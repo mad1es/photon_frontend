@@ -42,31 +42,52 @@ function AgentDetailCard({ agent }: AgentDetailCardProps) {
   const Icon = getIcon();
   const statusColor = getStatusColor(agent.status);
 
+  const getGradient = () => {
+    switch (agent.type) {
+      case 'market':
+        return 'bg-gradient-blue';
+      case 'decision':
+        return 'bg-gradient-yellow';
+      case 'execution':
+        return 'bg-gradient-green';
+      default:
+        return 'bg-gradient-primary';
+    }
+  };
+
   return (
-    <Card className="relative">
-      <div className={cn('absolute left-0 top-0 bottom-0 w-1 rounded-l-lg', statusColor)} />
+    <Card className="card-glass hover-lift relative border-l-2 border-l-primary/50">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon className="h-5 w-5" />
-            <CardTitle>{agent.name}</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className={cn('h-10 w-10 rounded-lg flex items-center justify-center', getGradient())}>
+              <Icon className="h-5 w-5 text-white" />
+            </div>
+            <CardTitle className="text-lg">{agent.name}</CardTitle>
           </div>
-          <Badge variant={agent.status === 'active' ? 'default' : 'secondary'}>
+          <Badge 
+            variant={agent.status === 'active' ? 'default' : 'secondary'}
+            className={cn(
+              agent.status === 'active' && 'bg-green-500/20 text-green-400 border-green-500/50',
+              agent.status === 'idle' && 'bg-gray-500/20 text-gray-400 border-gray-500/50',
+              agent.status === 'error' && 'bg-red-500/20 text-red-400 border-red-500/50'
+            )}
+          >
             {agent.status.toUpperCase()}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Messages Processed</p>
-          <p className="text-2xl font-bold">{agent.messagesProcessed}</p>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Messages Processed</p>
+          <p className="text-2xl font-bold tracking-tight">{agent.messagesProcessed}</p>
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Last Action</p>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Last Action</p>
           <p className="text-sm font-medium">{agent.lastAction}</p>
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Last Updated</p>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Last Updated</p>
           <p className="text-sm font-medium">
             {new Date(agent.lastUpdated).toLocaleString('en-US', {
               hour: '2-digit',
@@ -75,11 +96,11 @@ function AgentDetailCard({ agent }: AgentDetailCardProps) {
             })}
           </p>
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground mb-2">Recent Logs</p>
-          <div className="space-y-1">
+        <div className="pt-2 border-t border-border/50">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Recent Logs</p>
+          <div className="space-y-1.5">
             {agent.logs.slice(0, 3).map((log, idx) => (
-              <div key={idx} className="text-xs text-muted-foreground">
+              <div key={idx} className="text-xs text-muted-foreground font-mono">
                 [{new Date(log.timestamp).toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -88,7 +109,7 @@ function AgentDetailCard({ agent }: AgentDetailCardProps) {
             ))}
           </div>
         </div>
-        <Button variant="outline" className="w-full" asChild>
+        <Button variant="outline" className="w-full border-border/50 hover:bg-primary/10" asChild>
           <Link href="/agents">View Logs</Link>
         </Button>
       </CardContent>

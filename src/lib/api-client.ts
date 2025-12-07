@@ -51,7 +51,7 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = this.getAccessToken();
+    let token = this.getAccessToken();
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -68,7 +68,22 @@ class ApiClient {
     };
 
     try {
-      const response = await fetch(url, config);
+      let response = await fetch(url, config);
+
+      if (response.status === 401 && token) {
+        try {
+          const newToken = await this.refreshToken();
+          headers['Authorization'] = `Bearer ${newToken}`;
+          const retryConfig: RequestInit = {
+            ...options,
+            headers,
+          };
+          response = await fetch(url, retryConfig);
+        } catch (refreshError) {
+          this.clearTokens();
+          throw new Error('Session expired. Please login again.');
+        }
+      }
 
       if (!response.ok) {
         const errorData: ApiError = await response.json().catch(() => ({
@@ -160,6 +175,271 @@ class ApiClient {
 
   isAuthenticated(): boolean {
     return !!this.getAccessToken();
+  }
+
+  // Dashboard endpoints
+  async getDashboardOverview() {
+    return await this.request<{
+      balance: number;
+      todayPnL: number;
+      todayTradesCount: number;
+      winRate: number;
+      agentsStatus: string;
+      activeAgentsCount: number;
+    }>('/trading/dashboard/overview/');
+  }
+
+  async getMarketChart(symbol?: string, timeframe?: string) {
+    const params = new URLSearchParams();
+    if (symbol) params.append('symbol', symbol);
+    if (timeframe) params.append('timeframe', timeframe);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return await this.request<{
+      symbol: string;
+      currentPrice: number;
+      data: Array<{
+        timestamp: string;
+        price: number;
+        volume: number;
+      }>;
+    }>(`/trading/dashboard/market-chart/${query}`);
+  }
+
+  async getMarketHeatmap() {
+    return await this.request<Array<{
+      symbol: string;
+      price: number;
+      change: number;
+      changePercent: number;
+      volume: number;
+    }>>('/trading/dashboard/market-heatmap/');
+  }
+
+  // Portfolio endpoints
+  async getPortfolio() {
+    return await this.request<{
+      balance: number;
+      freeCash: number;
+      usedMargin: number;
+      totalTrades: number;
+      todayPnL: number;
+      totalPnL: number;
+    }>('/trading/portfolio/');
+  }
+
+  async getPositions() {
+    return await this.request<Array<{
+      id: number;
+      symbol: string;
+      quantity: number;
+      entryPrice: number;
+      currentPrice: number;
+      pnl: number;
+      pnlPercent: number;
+      openedAt: string;
+    }>>('/trading/positions/');
+  }
+
+  async getTrades(limit?: number) {
+    const params = limit ? `?limit=${limit}` : '';
+    return await this.request<Array<{
+      id: number;
+      symbol?: string | number;
+      symbol_name?: string;
+      action: 'BUY' | 'SELL' | 'HOLD';
+      price: number;
+      quantity: number;
+      agent: string;
+      pnl: number | null;
+      timestamp: string;
+    }>>(`/trading/trades/${params}`);
+  }
+
+  async getEquityCurve() {
+    return await this.request<{
+      data: Array<{
+        date: string;
+        balance: number;
+      }>;
+      initialBalance: number;
+      currentBalance: number;
+    }>('/trading/portfolio/equity-curve/');
+  }
+
+  // Agents endpoints
+  async getAgentsDetail() {
+    return await this.request<Array<{
+      id: number;
+      type: string;
+      name: string;
+      status: string;
+      lastAction: string;
+      lastUpdated: string;
+      messagesProcessed: number;
+      logs: Array<{
+        id: number;
+        level: string;
+        message: string;
+        timestamp: string;
+      }>;
+    }>>('/trading/agents/detail/');
+  }
+
+  async getMessages(limit?: number) {
+    const params = limit ? `?limit=${limit}` : '';
+    return await this.request<Array<{
+      id: string;
+      from: string;
+      to: string;
+      type: string;
+      payload: Record<string, any>;
+      timestamp: string;
+    }>>(`/trading/messages/${params}`);
+  }
+
+  async controlMarketMonitor(action: 'start' | 'stop') {
+    return await this.request('/trading/agents/market-monitor/', {
+      method: 'POST',
+      body: JSON.stringify({ action }),
+    });
+  }
+
+  async requestDecisionMaker(symbolId: number) {
+    return await this.request('/trading/agents/decision-maker/', {
+      method: 'POST',
+      body: JSON.stringify({ symbol_id: symbolId }),
+    });
+  }
+
+  async placeDemoOrder(params: { action: 'BUY' | 'SELL'; symbol: string; quantity: number }) {
+    return await this.request<{
+      status: string;
+      action: string;
+      symbol: string;
+      price: number;
+      quantity: number;
+      account: any;
+      position: any;
+      trade: any;
+    }>('/trading/demo/orders/', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
+
+  // Analytics endpoints
+  async getPerformanceMetrics() {
+    return await this.request<{
+      totalReturn: number;
+      totalReturnPercent: number;
+      sharpeRatio: number;
+      winRate: number;
+      maxDrawdown: number;
+      maxDrawdownPercent: number;
+      averageWin: number;
+      averageLoss: number;
+      profitFactor: number;
+      totalTrades: number;
+      winningTrades: number;
+      losingTrades: number;
+    }>('/trading/analytics/performance-metrics/');
+  }
+
+  async getPnLCurve() {
+    return await this.request<{
+      data: Array<{
+        date: string;
+        pnl: number;
+      }>;
+      totalPnL: number;
+    }>('/trading/analytics/pnl-curve/');
+  }
+
+  async getMonthlyBreakdown() {
+    return await this.request<{
+      today: number;
+      yesterday: number;
+      thisWeek: number;
+      thisMonth: number;
+      lastMonth: number;
+      monthly: Array<{
+        month: string;
+        pnl: number;
+      }>;
+    }>('/trading/analytics/monthly-breakdown/');
+  }
+
+  // Settings endpoints
+  async getSettings() {
+    return await this.request<{
+      status: string;
+      speed: string;
+      symbol: string;
+      timeframe: string;
+      dataProvider: string;
+      historyLength: string;
+      modelType: string;
+      predictionHorizon: string;
+      confidenceThreshold: string;
+      initialBalance: string;
+      maxPositionSize: string;
+      riskLevel: string;
+      stopLoss: string;
+      takeProfit: string;
+      maxLeverage: string;
+    }>('/trading/settings/');
+  }
+
+  async updateSettings(settings: Partial<{
+    status: string;
+    speed: string;
+    symbol: string;
+    timeframe: string;
+    dataProvider: string;
+    historyLength: string;
+    modelType: string;
+    predictionHorizon: string;
+    confidenceThreshold: string;
+    initialBalance: string;
+    maxPositionSize: string;
+    riskLevel: string;
+    stopLoss: string;
+    takeProfit: string;
+    maxLeverage: string;
+  }>) {
+    return await this.request('/trading/settings/', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
+  }
+
+  // Symbols endpoints
+  async getSymbols() {
+    return await this.request<Array<{
+      id: number;
+      symbol: string;
+      name: string;
+      type: string;
+      createdAt: string;
+    }>>('/trading/symbols/');
+  }
+
+  async addSymbol(symbol: string) {
+    return await this.request<{
+      id: number;
+      symbol: string;
+      name: string;
+      type: string;
+    }>('/trading/symbols/', {
+      method: 'POST',
+      body: JSON.stringify({ symbol }),
+    });
+  }
+
+  async deleteSymbol(id: number) {
+    return await this.request(`/trading/symbols/${id}/`, {
+      method: 'DELETE',
+    });
   }
 }
 

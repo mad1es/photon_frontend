@@ -37,23 +37,23 @@ function MessageItem({ message }: { message: Message }) {
   };
 
   return (
-    <div className="flex gap-3 py-2 border-b last:border-0">
+    <div className="flex gap-3 py-3 px-2 rounded-lg hover:bg-card/50 transition-colors border-b border-border/30 last:border-0">
       <div className="flex-shrink-0">
         <div className="flex flex-col items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-primary" />
-          <div className="w-px h-full bg-border" />
+          <div className="w-px h-full bg-border/50" />
         </div>
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-medium">
+        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+          <span className="text-sm font-semibold">
             {message.from.charAt(0).toUpperCase() + message.from.slice(1)}Agent
           </span>
           <span className="text-muted-foreground">→</span>
-          <span className="text-sm font-medium">
+          <span className="text-sm font-semibold">
             {message.to.charAt(0).toUpperCase() + message.to.slice(1)}Agent
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground ml-auto">
             {new Date(message.timestamp).toLocaleTimeString('en-US', {
               hour: '2-digit',
               minute: '2-digit',
@@ -61,7 +61,7 @@ function MessageItem({ message }: { message: Message }) {
             })}
           </span>
         </div>
-        <Badge className={cn('mb-1', getMessageTypeColor(message.type))}>
+        <Badge className={cn('mb-1.5 text-xs', getMessageTypeColor(message.type))}>
           {message.type}
         </Badge>
         <p className="text-sm text-muted-foreground">{formatPayload(message.payload)}</p>
@@ -83,13 +83,13 @@ export function MessageLog({ messages }: MessageLogProps) {
   }, [messages]);
 
   return (
-    <Card>
+    <Card className="card-glass hover-lift">
       <CardHeader>
         <CardTitle>Agent Communication Feed</CardTitle>
       </CardHeader>
       <CardContent>
         <div ref={scrollAreaRef}>
-          <ScrollArea className="h-[300px]">
+          <ScrollArea className="h-[400px]">
             <div className="space-y-1">
               {messages.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">

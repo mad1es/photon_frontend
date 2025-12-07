@@ -3,15 +3,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
 
-export function MonthlyBreakdown() {
-  const breakdown = [
-    { period: 'Today', pnl: 245 },
-    { period: 'Yesterday', pnl: 125 },
-    { period: 'This Week', pnl: 1245 },
-    { period: 'Dec 2024', pnl: 1450 },
-    { period: 'Nov 2024', pnl: 1000 },
-    { period: 'Oct 2024', pnl: 0 },
-  ];
+interface MonthlyBreakdownProps {
+  data?: {
+    today: number;
+    yesterday: number;
+    thisWeek: number;
+    thisMonth: number;
+    lastMonth: number;
+    monthly: Array<{ month: string; pnl: number }>;
+  } | null;
+}
+
+export function MonthlyBreakdown({ data }: MonthlyBreakdownProps) {
+  const breakdown = data
+    ? [
+        { period: 'Today', pnl: data.today || 0 },
+        { period: 'Yesterday', pnl: data.yesterday || 0 },
+        { period: 'This Week', pnl: data.thisWeek || 0 },
+        { period: 'This Month', pnl: data.thisMonth || 0 },
+        { period: 'Last Month', pnl: data.lastMonth || 0 },
+        ...(data.monthly && Array.isArray(data.monthly) 
+          ? data.monthly.slice(0, 1).map((m) => ({ period: m.month || '', pnl: m.pnl || 0 }))
+          : []),
+      ]
+    : [
+        { period: 'Today', pnl: 0 },
+        { period: 'Yesterday', pnl: 0 },
+        { period: 'This Week', pnl: 0 },
+        { period: 'This Month', pnl: 0 },
+        { period: 'Last Month', pnl: 0 },
+      ];
 
   return (
     <Card>

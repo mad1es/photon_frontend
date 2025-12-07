@@ -17,7 +17,7 @@ export function TradeHistory({ trades }: TradeHistoryProps) {
 
   if (trades.length === 0) {
     return (
-      <Card>
+      <Card className="card-glass">
         <CardHeader>
           <CardTitle>Trade History</CardTitle>
         </CardHeader>
@@ -31,47 +31,54 @@ export function TradeHistory({ trades }: TradeHistoryProps) {
   }
 
   return (
-    <Card>
+    <Card className="card-glass hover-lift">
       <CardHeader>
         <CardTitle>Trade History (Last 20)</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Time</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Agent</TableHead>
-              <TableHead className="text-right">P&L</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {trades.map((trade) => (
-              <TableRow key={trade.id}>
-                <TableCell>
-                  {new Date(trade.timestamp).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                  })}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={getActionBadgeVariant(trade.action)}>
-                    {trade.action}
-                  </Badge>
-                </TableCell>
-                <TableCell>{formatCurrency(trade.price)}</TableCell>
-                <TableCell>{trade.quantity}</TableCell>
-                <TableCell className="capitalize">{trade.agent}</TableCell>
+        <div className="rounded-lg border border-border/50 overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-border/50">
+                <TableHead className="font-semibold">Time</TableHead>
+                <TableHead className="font-semibold">Action</TableHead>
+                <TableHead className="font-semibold">Price</TableHead>
+                <TableHead className="font-semibold">Quantity</TableHead>
+                <TableHead className="font-semibold">Agent</TableHead>
+                <TableHead className="text-right font-semibold">P&L</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+            {trades.map((trade) => {
+              const quantity = typeof trade.quantity === 'number' ? trade.quantity : parseFloat(String(trade.quantity)) || 0;
+              
+              return (
+                <TableRow key={trade.id} className="border-b border-border/30 hover:bg-card/50 transition-colors">
+                  <TableCell>
+                    {new Date(trade.timestamp).toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={getActionBadgeVariant(trade.action)}
+                      className={trade.action === 'BUY' ? 'bg-green-500/20 text-green-400 border-green-500/50' : trade.action === 'SELL' ? 'bg-red-500/20 text-red-400 border-red-500/50' : ''}
+                    >
+                      {trade.action}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="font-medium">{formatCurrency(trade.price)}</TableCell>
+                  <TableCell>{quantity.toFixed(8)}</TableCell>
+                  <TableCell className="capitalize font-medium">{trade.agent}</TableCell>
                 <TableCell className="text-right">
                   {trade.pnl !== undefined ? (
                     <span
                       className={
                         trade.pnl >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
+                          ? 'text-green-400 font-semibold'
+                          : 'text-red-400 font-semibold'
                       }
                     >
                       {trade.pnl >= 0 ? '+' : ''}
@@ -82,9 +89,11 @@ export function TradeHistory({ trades }: TradeHistoryProps) {
                   )}
                 </TableCell>
               </TableRow>
-            ))}
+              );
+            })}
           </TableBody>
         </Table>
+        </div>
       </CardContent>
     </Card>
   );
