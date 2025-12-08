@@ -44,6 +44,8 @@ export function usePerformanceMetrics() {
 
 export function usePnLCurve() {
   const [data, setData] = useState<Array<{ date: string; pnl: number }>>([]);
+  const [initialBalance, setInitialBalance] = useState(0);
+  const [currentBalance, setCurrentBalance] = useState(0);
   const [totalPnL, setTotalPnL] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,8 +55,10 @@ export function usePnLCurve() {
       setLoading(true);
       setError(null);
       const result = await apiClient.getPnLCurve();
-      setData(result.data);
-      setTotalPnL(result.totalPnL);
+      setData(result.data || []);
+      setInitialBalance(result.initialBalance ?? 0);
+      setCurrentBalance(result.currentBalance ?? 0);
+      setTotalPnL(result.totalPnL ?? 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load P&L curve');
       console.error('P&L curve fetch error:', err);
@@ -67,7 +71,7 @@ export function usePnLCurve() {
     fetchData();
   }, []);
 
-  return { data, totalPnL, loading, error, refetch: fetchData };
+  return { data, totalPnL, initialBalance, currentBalance, loading, error, refetch: fetchData };
 }
 
 export function useMonthlyBreakdown() {

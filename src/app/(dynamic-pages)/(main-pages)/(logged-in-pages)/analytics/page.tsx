@@ -12,7 +12,14 @@ import { AlertCircle } from 'lucide-react';
 
 export default function AnalyticsPage() {
   const { data: metricsData, loading: metricsLoading, error: metricsError } = usePerformanceMetrics();
-  const { data: pnlData, totalPnL, loading: pnlLoading, error: pnlError } = usePnLCurve();
+  const {
+    data: pnlData,
+    totalPnL,
+    initialBalance: pnlInitial,
+    currentBalance: pnlCurrent,
+    loading: pnlLoading,
+    error: pnlError,
+  } = usePnLCurve();
   const { data: breakdownData, loading: breakdownLoading, error: breakdownError } = useMonthlyBreakdown();
   const { data: portfolioData } = usePortfolio();
 
@@ -60,8 +67,8 @@ export default function AnalyticsPage() {
       <div className="space-y-4">
         <PerformanceMetrics metrics={metricsData} />
         <PnLCurve
-          initialBalance={portfolioData?.initialBalance || 10000}
-          currentBalance={portfolioData?.balance || 10000}
+          initialBalance={pnlInitial || portfolioData?.initialBalance || 10000}
+          currentBalance={pnlCurrent || portfolioData?.balance || 10000}
           pnlData={pnlData}
         />
         <div className="grid gap-4 md:grid-cols-2">

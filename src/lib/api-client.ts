@@ -369,6 +369,8 @@ class ApiClient {
         pnl: number;
       }>;
       totalPnL: number;
+      initialBalance: number;
+      currentBalance: number;
     }>('/trading/analytics/pnl-curve/');
   }
 

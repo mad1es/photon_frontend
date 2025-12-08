@@ -39,11 +39,12 @@
   --border: #e9edf3;
   --input: #f1f4f7;
   --ring: #0038ff;
-  --chart-1: #00a0ff;
-  --chart-2: #ffe000;
-  --chart-3: #ff3a44;
-  --chart-4: #32a071;
-  --chart-5: #4d74ff;
+  /* HSL tokens to keep hsl(var(--chart-X)) working across charts */
+  --chart-1: 202 100% 50%;
+  --chart-2: 53 100% 50%;
+  --chart-3: 357 100% 61%;
+  --chart-4: 95 52% 41%;
+  --chart-5: 227 100% 65%;
   --radius: 0.5rem;
   --sidebar: #fff;
   --sidebar-foreground: #000;
@@ -178,11 +179,11 @@
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
   --ring: #0038ff;
-  --chart-1: #00a0ff;
-  --chart-2: #ffe000;
-  --chart-3: #ff3a44;
-  --chart-4: #32a071;
-  --chart-5: #4d74ff;
+  --chart-1: 202 100% 50%;
+  --chart-2: 53 100% 50%;
+  --chart-3: 357 100% 61%;
+  --chart-4: 95 52% 41%;
+  --chart-5: 227 100% 65%;
   --sidebar: #000;
   --sidebar-foreground: #fff;
   --sidebar-primary: #0038ff;

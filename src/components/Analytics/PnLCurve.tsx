@@ -20,18 +20,14 @@ interface PnLDataPoint {
 export function PnLCurve({ initialBalance, currentBalance, pnlData }: PnLCurveProps) {
   const generatePnLData = (): PnLDataPoint[] => {
     if (pnlData && pnlData.length > 0) {
-      let cumulativePnL = 0;
-      return pnlData.map((point, index) => {
-        cumulativePnL += point.pnl;
-        return {
-          day: index,
-          balance: initialBalance + cumulativePnL,
-          date: new Date(point.date).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          }),
-        };
-      });
+      return pnlData.map((point, index) => ({
+        day: index,
+        balance: initialBalance + point.pnl,
+        date: new Date(point.date).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        }),
+      }));
     }
 
     const data: PnLDataPoint[] = [];
