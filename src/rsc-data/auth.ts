@@ -1,5 +1,6 @@
+import { API_BASE_URL } from '@/lib/api-base';
 import { serverApiClient } from '@/lib/api-client-server';
-import { getServerAccessToken, getServerRefreshToken } from '@/utils/jwt-tokens';
+import { getServerAccessToken, getServerRefreshToken } from '@/utils/jwt-tokens.server';
 import { cache } from 'react';
 
 export interface User {
@@ -31,7 +32,6 @@ export const getCachedLoggedInVerifiedUser = cache(async () => {
     const refreshToken = await getServerRefreshToken();
     if (refreshToken) {
       try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
         const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -40,7 +40,7 @@ export const getCachedLoggedInVerifiedUser = cache(async () => {
 
         if (refreshResponse.ok) {
           const refreshData = await refreshResponse.json();
-          const { setServerAuthTokens } = await import('@/utils/jwt-tokens');
+          const { setServerAuthTokens } = await import('@/utils/jwt-tokens.server');
           await setServerAuthTokens(refreshData.access, refreshToken);
           const retryUser = await serverApiClient.getCurrentUser();
           if (retryUser) {

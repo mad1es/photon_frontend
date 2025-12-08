@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://91.147.104.165:666/api';
+import { API_BASE_URL } from './api-base';
 
 export interface ApiError {
   message: string;
@@ -44,6 +44,15 @@ class ApiClient {
 
   constructor(baseURL: string = API_BASE_URL) {
     this.baseURL = baseURL;
+  }
+
+  private getCookieToken(name: string): string | null {
+    if (typeof document === 'undefined') return null;
+    const tokenPair = document.cookie
+      .split(';')
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(`${name}=`));
+    return tokenPair ? tokenPair.split('=')[1] : null;
   }
 
   private async request<T>(
@@ -102,10 +111,8 @@ class ApiClient {
   }
 
   private getAccessToken(): string | null {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-    return localStorage.getItem('access_token');
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('access_token') || this.getCookieToken('access_token');
   }
 
   private setTokens(access: string, refresh: string): void {
@@ -114,6 +121,9 @@ class ApiClient {
     }
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
+    // keep cookies in sync so server-rendered parts can still read tokens
+    document.cookie = `access_token=${access}; path=/; max-age=${60 * 30}; sameSite=lax`;
+    document.cookie = `refresh_token=${refresh}; path=/; max-age=${60 * 60 * 24 * 7}; sameSite=lax`;
   }
 
   private clearTokens(): void {
@@ -122,6 +132,13 @@ class ApiClient {
     }
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    document.cookie = 'access_token=; path=/; max-age=0; sameSite=lax';
+    document.cookie = 'refresh_token=; path=/; max-age=0; sameSite=lax';
+  }
+
+  private getRefreshToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('refresh_token') || this.getCookieToken('refresh_token');
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {
@@ -151,7 +168,7 @@ class ApiClient {
   }
 
   async refreshToken(): Promise<string> {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
       throw new Error('No refresh token available');
     }
@@ -161,7 +178,7 @@ class ApiClient {
       body: JSON.stringify({ refresh: refreshToken }),
     });
 
-    localStorage.setItem('access_token', data.access);
+    this.setTokens(data.access, refreshToken);
     return data.access;
   }
 

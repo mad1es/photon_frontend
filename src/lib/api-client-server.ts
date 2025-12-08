@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
+import { API_BASE_URL } from './api-base';
 
 export interface UserResponse {
   id: number;

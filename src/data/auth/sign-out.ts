@@ -1,6 +1,6 @@
 'use server';
 
-import { clearServerAuthTokens } from '@/utils/jwt-tokens';
+import { clearServerAuthTokens } from '@/utils/jwt-tokens.server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 

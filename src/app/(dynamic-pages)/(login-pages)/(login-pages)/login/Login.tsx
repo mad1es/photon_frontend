@@ -5,6 +5,7 @@ import { RedirectingPleaseWaitCard } from '@/components/Auth/RedirectingPleaseWa
 import {
   signInWithPasswordAction,
 } from '@/data/auth/auth';
+import { setAuthTokens } from '@/utils/jwt-tokens';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
@@ -43,6 +44,10 @@ export function Login({
       onSuccess: ({ data }) => {
         if (hasRedirectedRef.current) return;
         hasRedirectedRef.current = true;
+
+        if (data?.access && data?.refresh) {
+          setAuthTokens(data.access, data.refresh);
+        }
 
         toast.success('Logged in!', {
           id: toastRef.current,

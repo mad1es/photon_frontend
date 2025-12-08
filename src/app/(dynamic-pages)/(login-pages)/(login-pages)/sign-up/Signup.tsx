@@ -18,6 +18,7 @@ import {
   Info
 } from 'lucide-react';
 import Link from 'next/link';
+import { setAuthTokens } from '@/utils/jwt-tokens';
 
 interface SignUpProps {
   next?: string;
@@ -38,6 +39,10 @@ export function SignUp({ next }: SignUpProps) {
       onSuccess: ({ data }) => {
         if (hasRedirectedRef.current) return;
         hasRedirectedRef.current = true;
+
+        if (data?.access && data?.refresh) {
+          setAuthTokens(data.access, data.refresh);
+        }
 
         toast.success('Account created!', { id: toastRef.current });
         toastRef.current = undefined;

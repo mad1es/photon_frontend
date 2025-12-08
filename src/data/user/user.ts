@@ -1,7 +1,7 @@
 'use server'
 
 import { serverApiClient } from '@/lib/api-client-server';
-import { getServerAccessToken, getServerRefreshToken } from '@/utils/jwt-tokens';
+import { getServerAccessToken, getServerRefreshToken } from '@/utils/jwt-tokens.server';
 
 export async function getLoggedInUserId(): Promise<string> {
   const token = await getServerAccessToken();

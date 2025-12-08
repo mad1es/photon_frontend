@@ -1,9 +1,8 @@
 'use server';
+import { API_BASE_URL } from '@/lib/api-base';
 import { actionClient } from '@/lib/safe-action';
-import { setServerAuthTokens } from '@/utils/jwt-tokens';
+import { setServerAuthTokens } from '@/utils/jwt-tokens.server';
 import { z } from 'zod';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
 
 const signUpSchema = z.object({
   email: z.string().email(),
@@ -115,8 +114,7 @@ export const signInWithPasswordAction = actionClient
  * @throws {Error} If there's an error refreshing the token.
  */
 export const refreshTokenAction = actionClient.action(async () => {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
-  const { getServerRefreshToken, setServerAuthTokens } = await import('@/utils/jwt-tokens');
+  const { getServerRefreshToken, setServerAuthTokens } = await import('@/utils/jwt-tokens.server');
   
   const refreshToken = await getServerRefreshToken();
   if (!refreshToken) {

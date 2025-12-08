@@ -1,4 +1,5 @@
 'use server';
+import { API_BASE_URL } from '@/lib/api-base';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 
@@ -9,8 +10,7 @@ const updatePasswordSchema = z.object({
 export const updatePasswordAction = authActionClient
   .schema(updatePasswordSchema)
   .action(async ({ parsedInput: { password } }) => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://91.147.104.165:666/api';
-    const { getServerAccessToken } = await import('@/utils/jwt-tokens');
+    const { getServerAccessToken } = await import('@/utils/jwt-tokens.server');
     
     const token = await getServerAccessToken();
     if (!token) {
