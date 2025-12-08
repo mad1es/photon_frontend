@@ -61,6 +61,48 @@ export function useAgents() {
     }
   };
 
+  const startDecisionMaker = async (symbolId?: number) => {
+    try {
+      if (symbolId) {
+        await apiClient.requestDecisionMaker(symbolId);
+      } else {
+        // For general start without specific symbol
+        await apiClient.getDecisionMakerStatus();
+      }
+      await fetchAgents();
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to start decision maker');
+    }
+  };
+
+  const stopDecisionMaker = async () => {
+    try {
+      // Note: The API might not have a direct stop endpoint for decision maker
+      // This would need to be implemented on the backend
+      await fetchAgents();
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to stop decision maker');
+    }
+  };
+
+  const startExecutionAgent = async () => {
+    try {
+      await apiClient.controlExecutionAgent('start');
+      await fetchAgents();
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to start execution agent');
+    }
+  };
+
+  const stopExecutionAgent = async () => {
+    try {
+      await apiClient.controlExecutionAgent('stop');
+      await fetchAgents();
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to stop execution agent');
+    }
+  };
+
   return {
     agents,
     loading,
@@ -68,6 +110,10 @@ export function useAgents() {
     refetch: fetchAgents,
     startMarketMonitor,
     stopMarketMonitor,
+    startDecisionMaker,
+    stopDecisionMaker,
+    startExecutionAgent,
+    stopExecutionAgent,
   };
 }
 

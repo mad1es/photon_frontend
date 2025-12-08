@@ -321,11 +321,71 @@ class ApiClient {
     });
   }
 
+  async getMarketMonitorStatus() {
+    return await this.request<{
+      id: number;
+      status: string;
+      last_updated: string;
+      config: Record<string, any>;
+    }>('/trading/agents/market-monitor/');
+  }
+
   async requestDecisionMaker(symbolId: number) {
     return await this.request('/trading/agents/decision-maker/', {
       method: 'POST',
       body: JSON.stringify({ symbol_id: symbolId }),
     });
+  }
+
+  async getDecisionMakerStatus() {
+    return await this.request<{
+      id: number;
+      status: string;
+      last_updated: string;
+      config: Record<string, any>;
+    }>('/trading/agents/decision-maker/');
+  }
+
+  async controlExecutionAgent(action: 'start' | 'stop') {
+    return await this.request('/trading/agents/execution/', {
+      method: 'POST',
+      body: JSON.stringify({ action }),
+    });
+  }
+
+  async getExecutionAgentStatus() {
+    return await this.request<{
+      id: number;
+      status: string;
+      last_updated: string;
+      config: Record<string, any>;
+    }>('/trading/agents/execution/');
+  }
+
+  async getAgentsStatus() {
+    return await this.request<Array<{
+      id: number;
+      name: string;
+      type: string;
+      status: string;
+      last_updated: string;
+    }>>('/trading/agents/status/');
+  }
+
+  async getAgentStatus(id: number) {
+    return await this.request<{
+      id: number;
+      name: string;
+      type: string;
+      status: string;
+      last_updated: string;
+      config: Record<string, any>;
+      logs: Array<{
+        timestamp: string;
+        level: string;
+        message: string;
+      }>;
+    }>(`/trading/agents/status/${id}/`);
   }
 
   async placeDemoOrder(params: { action: 'BUY' | 'SELL'; symbol: string; quantity: number }) {
@@ -458,6 +518,143 @@ class ApiClient {
   async deleteSymbol(id: number) {
     return await this.request(`/trading/symbols/${id}/`, {
       method: 'DELETE',
+    });
+  }
+
+  // Decisions endpoints
+  async getDecisions(limit?: number) {
+    const params = limit ? `?limit=${limit}` : '';
+    return await this.request<Array<{
+      id: number;
+      symbol: string;
+      action: 'BUY' | 'SELL' | 'HOLD';
+      confidence: number;
+      reasoning: string;
+      created_at: string;
+      executed_at?: string;
+      status: string;
+    }>>(`/trading/decisions/${params}`);
+  }
+
+  async createDecision(decision: {
+    symbol: string;
+    action: 'BUY' | 'SELL' | 'HOLD';
+    confidence?: number;
+    reasoning?: string;
+  }) {
+    return await this.request<{
+      id: number;
+      symbol: string;
+      action: string;
+      confidence: number;
+      reasoning: string;
+      created_at: string;
+      status: string;
+    }>('/trading/decisions/', {
+      method: 'POST',
+      body: JSON.stringify(decision),
+    });
+  }
+
+  async getDecision(id: number) {
+    return await this.request<{
+      id: number;
+      symbol: string;
+      action: 'BUY' | 'SELL' | 'HOLD';
+      confidence: number;
+      reasoning: string;
+      created_at: string;
+      executed_at?: string;
+      status: string;
+    }>(`/trading/decisions/${id}/`);
+  }
+
+  async updateDecision(id: number, decision: Partial<{
+    symbol: string;
+    action: 'BUY' | 'SELL' | 'HOLD';
+    confidence: number;
+    reasoning: string;
+    status: string;
+  }>) {
+    return await this.request(`/trading/decisions/${id}/`, {
+      method: 'PUT',
+      body: JSON.stringify(decision),
+    });
+  }
+
+  async patchDecision(id: number, decision: Partial<{
+    symbol: string;
+    action: 'BUY' | 'SELL' | 'HOLD';
+    confidence: number;
+    reasoning: string;
+    status: string;
+  }>) {
+    return await this.request(`/trading/decisions/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(decision),
+    });
+  }
+
+  async deleteDecision(id: number) {
+    return await this.request(`/trading/decisions/${id}/`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getDecisionsStatistics() {
+    return await this.request<{
+      total_decisions: number;
+      successful_decisions: number;
+      failed_decisions: number;
+      pending_decisions: number;
+      average_confidence: number;
+      win_rate: number;
+    }>('/trading/decisions/statistics/');
+  }
+
+  // Market Data endpoints
+  async getMarketData(limit?: number) {
+    const params = limit ? `?limit=${limit}` : '';
+    return await this.request<Array<{
+      id: number;
+      symbol: string;
+      price: number;
+      volume: number;
+      timestamp: string;
+      source: string;
+    }>>(`/trading/market-data/${params}`);
+  }
+
+  async getMarketDataById(id: number) {
+    return await this.request<{
+      id: number;
+      symbol: string;
+      price: number;
+      volume: number;
+      timestamp: string;
+      source: string;
+      additional_data?: Record<string, any>;
+    }>(`/trading/market-data/${id}/`);
+  }
+
+  async getLatestMarketData() {
+    return await this.request<Array<{
+      symbol: string;
+      price: number;
+      change: number;
+      change_percent: number;
+      volume: number;
+      timestamp: string;
+    }>>('/trading/market-data/latest/');
+  }
+
+  async refreshMarketData() {
+    return await this.request<{
+      status: string;
+      message: string;
+      updated_records: number;
+    }>('/trading/market-data/refresh/', {
+      method: 'POST',
     });
   }
 }

@@ -12,7 +12,7 @@ import {
 import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar";
 import { signOutAction } from "@/data/auth/sign-out";
 import { User } from "@/rsc-data/auth";
-import { ChevronUp, Home, LogOut, Settings, Wallet, Users, BarChart3, Cog } from "lucide-react";
+import { ChevronUp, Home, LogOut, Settings, Wallet, Users, BarChart3, Cog, Target, Database } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTransition } from "react";
@@ -36,6 +36,16 @@ const navigationItems: { title: string; url: string; icon: React.ElementType }[]
     title: 'Analytics',
     url: '/analytics',
     icon: BarChart3,
+  },
+  {
+    title: 'Decisions',
+    url: '/decisions',
+    icon: Target,
+  },
+  {
+    title: 'Market Data',
+    url: '/market-data',
+    icon: Database,
   },
   {
     title: 'Settings',

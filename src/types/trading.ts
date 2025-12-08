@@ -130,3 +130,42 @@ export interface ChartDataPoint {
   volume?: number;
 }
 
+export interface Decision {
+  id: string;
+  symbol: string;
+  action: TradeAction;
+  confidence: number;
+  reasoning: string;
+  createdAt: Date;
+  executedAt?: Date;
+  status: 'pending' | 'executed' | 'cancelled' | 'failed';
+}
+
+export interface DecisionStatistics {
+  totalDecisions: number;
+  successfulDecisions: number;
+  failedDecisions: number;
+  pendingDecisions: number;
+  averageConfidence: number;
+  winRate: number;
+}
+
+export interface MarketDataItem {
+  id: number;
+  symbol: string;
+  price: number;
+  volume: number;
+  timestamp: Date;
+  source: string;
+  additionalData?: Record<string, any>;
+}
+
+export interface LatestMarketDataItem {
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  timestamp: Date;
+}
+

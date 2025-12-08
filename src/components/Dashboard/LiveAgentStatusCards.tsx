@@ -1,10 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, Brain, Zap, Clock, Activity } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BarChart3, Brain, Zap, Clock, Activity, Play, Square, RefreshCw } from 'lucide-react';
 import { Agent } from '@/types/trading';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { useAgents } from '@/hooks/use-agents';
 
 interface LiveAgentStatusCardProps {
   agent: Agent;
@@ -36,6 +40,54 @@ export function LiveAgentStatusCard({ agent, index }: LiveAgentStatusCardProps) 
   const config = agentConfig[index];
   const Icon = config.icon;
   const isOnline = agent.status === 'active';
+  const [isControlling, setIsControlling] = useState(false);
+  const {
+    startMarketMonitor,
+    stopMarketMonitor,
+    startDecisionMaker,
+    stopDecisionMaker,
+    startExecutionAgent,
+    stopExecutionAgent,
+  } = useAgents();
+
+  const handleControl = async (action: 'start' | 'stop') => {
+    setIsControlling(true);
+    try {
+      if (index === 0) {
+        // Market Monitor
+        if (action === 'start') {
+          await startMarketMonitor();
+          toast.success('Market Monitor started');
+        } else {
+          await stopMarketMonitor();
+          toast.success('Market Monitor stopped');
+        }
+      } else if (index === 1) {
+        // Decision Maker
+        if (action === 'start') {
+          await startDecisionMaker();
+          toast.success('Decision Maker started');
+        } else {
+          await stopDecisionMaker();
+          toast.success('Decision Maker stopped');
+        }
+      } else if (index === 2) {
+        // Execution Agent
+        if (action === 'start') {
+          await startExecutionAgent();
+          toast.success('Execution Agent started');
+        } else {
+          await stopExecutionAgent();
+          toast.success('Execution Agent stopped');
+        }
+      }
+    } catch (error) {
+      toast.error(`Failed to ${action} ${config.name}`);
+      console.error(`Failed to ${action} ${config.name}:`, error);
+    } finally {
+      setIsControlling(false);
+    }
+  };
 
   return (
     <Card className="card-glass hover-lift">
@@ -105,17 +157,35 @@ export function LiveAgentStatusCard({ agent, index }: LiveAgentStatusCardProps) 
             </div>
           </div>
         )}
-        <div className="pt-2 border-t border-border/50">
+        <div className="pt-2 border-t border-border/50 space-y-3">
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground flex items-center gap-1">
               <Activity className="h-3 w-3" />
               Last updated
             </span>
             <span className="font-medium">
-              {typeof agent.lastUpdated === 'string' 
+              {typeof agent.lastUpdated === 'string'
                 ? new Date(agent.lastUpdated).toLocaleTimeString()
                 : agent.lastUpdated.toLocaleTimeString()}
             </span>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant={isOnline ? "secondary" : "default"}
+              className="flex-1"
+              disabled={isControlling}
+              onClick={() => handleControl(isOnline ? 'stop' : 'start')}
+            >
+              {isControlling ? (
+                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+              ) : isOnline ? (
+                <Square className="h-3 w-3 mr-1" />
+              ) : (
+                <Play className="h-3 w-3 mr-1" />
+              )}
+              {isOnline ? 'Stop' : 'Start'}
+            </Button>
           </div>
         </div>
       </CardContent>
