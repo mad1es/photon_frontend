@@ -92,6 +92,7 @@
     "framer-motion": "^11.18.2",
     "input-otp": "^1.4.2",
     "jsdom": "^21.1.2",
+    "lightweight-charts": "^5.0.9",
     "lucide-react": "^0.546.0",
     "next": "^16.0.1",
     "next-nprogress-bar": "^2.4.7",

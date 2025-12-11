@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { KPICards } from '@/components/Dashboard/KPICards';
-import { MarketChart } from '@/components/Dashboard/MarketChart';
+import { CandlestickChart } from '@/components/CryptoDashboard/CandlestickChart';
 import { LiveAgentStatusCards } from '@/components/Dashboard/LiveAgentStatusCards';
 import { TradeActivityFeed } from '@/components/Dashboard/TradeActivityFeed';
 import { MarketHeatmap } from '@/components/Dashboard/MarketHeatmap';
 import { MessageLog } from '@/components/Dashboard/MessageLog';
+import { CryptoSelector } from '@/components/CryptoDashboard/CryptoSelector';
 import { useDashboard } from '@/hooks/use-dashboard';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -16,6 +17,10 @@ function DashboardContent() {
   const [selectedSymbol, setSelectedSymbol] = useState<string>('BTCUSDT');
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>('1h');
   const { data, loading, error } = useDashboard(selectedSymbol, selectedTimeframe);
+
+  const formatSymbol = (symbol: string) => {
+    return symbol.replace('USDT', '/USDT');
+  };
 
   if (loading && !data) {
     return (
@@ -76,12 +81,16 @@ function DashboardContent() {
 
       {/* Market Chart & Heatmap Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <MarketChart
-          data={data.chartData}
-          symbol={selectedSymbol}
-          currentPrice={data.currentPrice}
-        />
-        <MarketHeatmap marketData={data.marketHeatmap} />
+        <div className="dashboard-card rounded-lg p-4">
+          <div className="mb-4 space-y-3">
+            <h3 className="text-xl font-semibold text-white">
+              {formatSymbol(selectedSymbol)}
+            </h3>
+            <CryptoSelector selectedSymbol={selectedSymbol} onSymbolChange={setSelectedSymbol} />
+          </div>
+          <CandlestickChart symbol={selectedSymbol} interval="1h" />
+        </div>
+        <MarketHeatmap />
       </div>
 
       {/* Trade Activity Feed & Agent Communication Log */}
