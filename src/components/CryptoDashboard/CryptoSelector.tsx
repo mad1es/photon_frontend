@@ -33,8 +33,8 @@ export function CryptoSelector({ selectedSymbol, onSymbolChange }: CryptoSelecto
           className={cn(
             'text-xs flex items-center gap-2',
             selectedSymbol === crypto.symbol
-              ? 'bg-white/10 border-white/20 text-white'
-              : 'bg-transparent border-white/10 text-white/70 hover:bg-white/5'
+              ? 'bg-white/10 dark:bg-white/10 border-white/20 dark:border-white/20 text-black dark:text-white border-black/20'
+              : 'bg-transparent border-white/10 dark:border-white/10 text-black/70 dark:text-white/70 hover:bg-white/5 dark:hover:bg-white/5 border-black/10 hover:bg-black/5'
           )}
         >
           <img
