@@ -35,20 +35,20 @@ export function DashboardHeader({ heading }: DashboardHeaderProps) {
   };
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border/50 px-4 bg-card/30 backdrop-blur-xl">
-      <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="mr-2 h-4" />
-      <div className="flex-1">{heading}</div>
+    <header className="dashboard-header flex h-16 shrink-0 items-center gap-2 border-b border-white/10 dark:border-white/10 border-black/10 px-4 bg-[var(--dashboard-background-card)] backdrop-blur-[50px]">
+      <SidebarTrigger className="-ml-1 text-white dark:text-white text-black hover:bg-white/5 dark:hover:bg-white/5 hover:bg-black/5" />
+      <Separator orientation="vertical" className="mr-2 h-4 bg-white/10 dark:bg-white/10 bg-black/10" />
+      <div className="flex-1 text-white dark:text-white text-black">{heading}</div>
       <div className="flex items-center gap-4">
         {mounted && currentTime && (
-          <div className="text-sm font-medium text-foreground/80">{formatTime(currentTime)}</div>
+          <div className="text-sm font-medium text-white/70 dark:text-white/70 text-black/70">{formatTime(currentTime)}</div>
         )}
         {mounted && (
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="hover:bg-accent/50"
+            className="hover:bg-white/5 dark:hover:bg-white/5 hover:bg-black/5 text-white dark:text-white text-black"
           >
             {theme === 'dark' ? (
               <Sun className="h-4 w-4" />

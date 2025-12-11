@@ -7,6 +7,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Line, LineChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Bar, BarChart, ReferenceLine } from 'recharts';
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, CandlestickChart } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { ChartDataPoint } from '@/types/trading';
 
 interface MarketChartProps {
@@ -42,7 +43,7 @@ export function MarketChart({ data, symbol, currentPrice, onTimeframeChange }: M
       close: point.price,
       volume: point.volume || 0,
       timestamp: point.timestamp.getTime(),
-      color: prevPoint && point.price >= prevPoint.price ? 'hsl(var(--chart-2))' : 'hsl(var(--chart-3))',
+      color: 'rgba(255, 255, 255, 0.7)',
     };
   });
 
@@ -56,11 +57,11 @@ export function MarketChart({ data, symbol, currentPrice, onTimeframeChange }: M
   const chartConfig = {
     price: {
       label: 'Price',
-      color: 'hsl(var(--chart-1))',
+      color: 'var(--dashboard-accent-primary)',
     },
     volume: {
       label: 'Volume',
-      color: 'hsl(var(--chart-4))',
+      color: 'var(--dashboard-accent-secondary)',
     },
   };
 
@@ -70,14 +71,17 @@ export function MarketChart({ data, symbol, currentPrice, onTimeframeChange }: M
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white dark:text-white text-black">
                 {symbol} Price Chart
-                <div className={`flex items-center gap-1 text-sm font-normal ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                <div className={cn(
+                  "flex items-center gap-1 text-sm font-normal",
+                  isPositive ? "text-[var(--dashboard-profit)]" : "text-[var(--dashboard-loss)]"
+                )}>
                   {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                   {isPositive ? '+' : ''}{priceChangePercent}%
                 </div>
               </CardTitle>
-              <p className="text-2xl font-bold mt-1">
+              <p className="text-2xl font-bold mt-1 text-white dark:text-white text-black">
                 {new Intl.NumberFormat('en-US', {
                   style: 'currency',
                   currency: 'USD',
@@ -90,7 +94,12 @@ export function MarketChart({ data, symbol, currentPrice, onTimeframeChange }: M
                 variant={chartType === 'line' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setChartType('line')}
-                className="border-border/50"
+                className={cn(
+                  "border-border/50",
+                  chartType === 'line' 
+                    ? "text-white dark:text-white text-black dark:bg-[var(--dashboard-accent-primary)] bg-[var(--dashboard-accent-primary)] hover:opacity-90"
+                    : "text-white dark:text-white text-black border-white/20 dark:border-white/20 border-black/20"
+                )}
               >
                 Line
               </Button>
@@ -98,7 +107,12 @@ export function MarketChart({ data, symbol, currentPrice, onTimeframeChange }: M
                 variant={chartType === 'candlestick' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setChartType('candlestick')}
-                className="border-border/50"
+                className={cn(
+                  "border-border/50",
+                  chartType === 'candlestick'
+                    ? "text-white dark:text-white text-black dark:bg-[var(--dashboard-accent-primary)] bg-[var(--dashboard-accent-primary)] hover:opacity-90"
+                    : "text-white dark:text-white text-black border-white/20 dark:border-white/20 border-black/20"
+                )}
               >
                 <CandlestickChart className="h-4 w-4 mr-1" />
                 Candles
@@ -140,10 +154,10 @@ export function MarketChart({ data, symbol, currentPrice, onTimeframeChange }: M
                 <Line
                   type="monotone"
                   dataKey="price"
-                  stroke="hsl(var(--chart-1))"
+                  stroke="var(--dashboard-accent-primary)"
                   strokeWidth={2}
                   dot={false}
-                  activeDot={{ r: 4, fill: 'hsl(var(--chart-1))' }}
+                  activeDot={{ r: 4, fill: 'var(--dashboard-accent-primary)' }}
                 />
               </LineChart>
             ) : (
@@ -190,7 +204,7 @@ export function MarketChart({ data, symbol, currentPrice, onTimeframeChange }: M
                 />
                 <Bar
                   dataKey="price"
-                  fill="hsl(var(--chart-1))"
+                  fill="var(--dashboard-accent-primary)"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>

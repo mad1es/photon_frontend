@@ -64,9 +64,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${roboto_mono.variable} dark`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${roboto_mono.variable}`} suppressHydrationWarning>
       <head />
-      <body className="dark font-sans antialiased bg-background text-foreground">
+      <body className="font-sans antialiased bg-background text-foreground">
         <DynamicLayoutProviders>
           <div className="flex pt-2 flex-col min-h-screen bg-background">
             <ClientLayout>{children}</ClientLayout>

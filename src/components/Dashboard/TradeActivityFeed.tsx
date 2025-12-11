@@ -54,16 +54,14 @@ export function TradeActivityFeed({ trades }: TradeActivityFeedProps) {
                   className="flex items-center justify-between p-3 rounded-lg bg-card/50 border border-border/50 hover:bg-card/70 transition-colors"
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    <div
-                      className={cn(
-                        'h-8 w-8 rounded-full flex items-center justify-center',
-                        isBuy ? 'bg-green-500/20' : 'bg-red-500/20'
-                      )}
-                    >
+                    <div className={cn(
+                      "h-8 w-8 rounded-full flex items-center justify-center",
+                      isBuy ? "bg-[var(--dashboard-profit)]/20" : "bg-[var(--dashboard-loss)]/20"
+                    )}>
                       {isBuy ? (
-                        <ArrowUpRight className="h-4 w-4 text-green-400" />
+                        <ArrowUpRight className="h-4 w-4 text-[var(--dashboard-profit)]" />
                       ) : (
-                        <ArrowDownRight className="h-4 w-4 text-red-400" />
+                        <ArrowDownRight className="h-4 w-4 text-[var(--dashboard-loss)]" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -85,15 +83,16 @@ export function TradeActivityFeed({ trades }: TradeActivityFeedProps) {
                   </div>
                   {hasPnl && (
                     <div className="text-right">
-                      <div
-                        className={cn(
-                          'font-semibold text-sm',
-                          isProfit ? 'text-green-400' : 'text-red-400'
-                        )}
-                      >
+                      <div className={cn(
+                        "font-semibold text-sm",
+                        isProfit ? "text-[var(--dashboard-profit)]" : "text-[var(--dashboard-loss)]"
+                      )}>
                         {isProfit ? '+' : ''}{formatCurrency(trade.pnl!)}
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className={cn(
+                        "text-xs",
+                        isProfit ? "text-[var(--dashboard-profit)]/70" : "text-[var(--dashboard-loss)]/70"
+                      )}>
                         {((trade.pnl! / trade.price) * 100).toFixed(2)}%
                       </div>
                     </div>

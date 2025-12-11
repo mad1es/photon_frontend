@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
 import { ReactNode, Suspense } from 'react';
 import { AppSidebar } from './app-sidebar';
 import { DashboardHeader } from '@/components/Layout/DashboardHeader';
-import Footer from '@/components/Footer';
+import '@/styles/dashboard.css';
 
 async function AuthGuard({ children }: { children: ReactNode }) {
   const isLoggedIn = await getCachedIsUserLoggedIn();
@@ -29,16 +29,17 @@ export default async function Layout({
   return (
     <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
       <AuthGuard>
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="flex flex-col min-h-screen">
-        <DashboardHeader heading={heading} />
-        <div className="flex-1">
-              {children}
+        <div className="dashboard-layout">
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset className="flex flex-col min-h-screen bg-[var(--dashboard-background)]">
+              <DashboardHeader heading={heading} />
+              <div className="flex-1">
+                {children}
+              </div>
+            </SidebarInset>
+          </SidebarProvider>
         </div>
-        <Footer />
-      </SidebarInset>
-    </SidebarProvider>
       </AuthGuard>
     </Suspense>
   );

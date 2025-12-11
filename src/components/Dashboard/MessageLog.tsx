@@ -15,13 +15,13 @@ function MessageItem({ message }: { message: Message }) {
   const getMessageTypeColor = (type: string) => {
     switch (type) {
       case 'MARKET_SNAPSHOT':
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+        return 'bg-[var(--dashboard-accent-primary)]/10 text-[var(--dashboard-accent-primary)] border-[var(--dashboard-accent-primary)]/20';
       case 'TRADE_DECISION':
-        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400';
+        return 'bg-[var(--dashboard-accent-secondary)]/10 text-[var(--dashboard-accent-secondary)] border-[var(--dashboard-accent-secondary)]/20';
       case 'EXECUTION_REPORT':
-        return 'bg-green-500/10 text-green-600 dark:text-green-400';
+        return 'bg-[var(--dashboard-accent-primary)]/10 text-[var(--dashboard-accent-primary)] border-[var(--dashboard-accent-primary)]/20';
       default:
-        return 'bg-gray-500/10 text-gray-600 dark:text-gray-400';
+        return 'bg-white/5 text-white/70 border-white/10';
     }
   };
 
@@ -40,8 +40,8 @@ function MessageItem({ message }: { message: Message }) {
     <div className="flex gap-3 py-3 px-2 rounded-lg hover:bg-card/50 transition-colors border-b border-border/30 last:border-0">
       <div className="flex-shrink-0">
         <div className="flex flex-col items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-primary" />
-          <div className="w-px h-full bg-border/50" />
+          <div className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-primary)]" />
+          <div className="w-px h-full bg-white/10" />
         </div>
       </div>
       <div className="flex-1 min-w-0">

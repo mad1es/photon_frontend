@@ -471,8 +471,8 @@
   
   /* Public.com glass morphism effects */
   .card-glass {
-    background: #000000 !important;
-    border: 0.3px solid #4a4a4a !important;
+    background: #ffffff !important;
+    border: 0.3px solid #e5e7eb !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;

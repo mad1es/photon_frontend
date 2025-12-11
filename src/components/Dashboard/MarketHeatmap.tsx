@@ -70,8 +70,8 @@ export function MarketHeatmap({ marketData }: MarketHeatmapProps) {
           {/* Top Gainers */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="h-4 w-4 text-green-400" />
-              <h4 className="font-semibold text-sm">Top Gainers</h4>
+              <TrendingUp className="h-4 w-4 text-[var(--dashboard-profit)]" />
+              <h4 className="font-semibold text-sm text-white dark:text-white text-black">Top Gainers</h4>
             </div>
             {topGainers.length === 0 ? (
               <p className="text-muted-foreground text-sm">No gainers available</p>
@@ -83,24 +83,19 @@ export function MarketHeatmap({ marketData }: MarketHeatmapProps) {
                 return (
                   <div
                     key={item.symbol}
-                    className={cn(
-                      'flex items-center justify-between p-3 rounded-lg border transition-colors',
-                      intensity === 'high' && 'bg-green-500/20 border-green-500/30',
-                      intensity === 'medium' && 'bg-green-500/10 border-green-500/20',
-                      intensity === 'low' && 'bg-card/50 border-border/50'
-                    )}
+                    className="flex items-center justify-between p-3 rounded-lg border border-[var(--dashboard-profit)]/20 bg-[var(--dashboard-profit)]/5 transition-colors"
                   >
                     <div className="flex-1">
-                      <div className="font-semibold text-sm">{item.symbol}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="font-semibold text-sm text-white dark:text-white text-black">{item.symbol}</div>
+                      <div className="text-xs text-white/50 dark:text-white/50 text-black/50">
                         ${item.price.toFixed(2)}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-semibold text-sm text-green-400">
+                      <div className="font-semibold text-sm text-[var(--dashboard-profit)]">
                         +{change.toFixed(2)}%
                       </div>
-                      <div className="text-xs text-muted-foreground">Vol: {item.volume}</div>
+                      <div className="text-xs text-white/50 dark:text-white/50 text-black/50">Vol: {item.volume}</div>
                     </div>
                   </div>
                 );
@@ -111,8 +106,8 @@ export function MarketHeatmap({ marketData }: MarketHeatmapProps) {
           {/* Top Losers */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-3">
-              <TrendingDown className="h-4 w-4 text-red-400" />
-              <h4 className="font-semibold text-sm">Top Losers</h4>
+              <TrendingDown className="h-4 w-4 text-[var(--dashboard-loss)]" />
+              <h4 className="font-semibold text-sm text-white dark:text-white text-black">Top Losers</h4>
             </div>
             {topLosers.length === 0 ? (
               <p className="text-muted-foreground text-sm">No losers available</p>
@@ -124,24 +119,19 @@ export function MarketHeatmap({ marketData }: MarketHeatmapProps) {
                 return (
                   <div
                     key={item.symbol}
-                    className={cn(
-                      'flex items-center justify-between p-3 rounded-lg border transition-colors',
-                      intensity === 'high' && 'bg-red-500/20 border-red-500/30',
-                      intensity === 'medium' && 'bg-red-500/10 border-red-500/20',
-                      intensity === 'low' && 'bg-card/50 border-border/50'
-                    )}
+                    className="flex items-center justify-between p-3 rounded-lg border border-[var(--dashboard-loss)]/20 bg-[var(--dashboard-loss)]/5 transition-colors"
                   >
                     <div className="flex-1">
-                      <div className="font-semibold text-sm">{item.symbol}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="font-semibold text-sm text-white dark:text-white text-black">{item.symbol}</div>
+                      <div className="text-xs text-white/50 dark:text-white/50 text-black/50">
                         ${item.price.toFixed(2)}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-semibold text-sm text-red-400">
+                      <div className="font-semibold text-sm text-[var(--dashboard-loss)]">
                         {change.toFixed(2)}%
                       </div>
-                      <div className="text-xs text-muted-foreground">Vol: {item.volume}</div>
+                      <div className="text-xs text-white/50 dark:text-white/50 text-black/50">Vol: {item.volume}</div>
                     </div>
                   </div>
                 );

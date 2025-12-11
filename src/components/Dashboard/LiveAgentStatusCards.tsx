@@ -19,19 +19,22 @@ const agentConfig = [
   {
     name: 'Market Monitor',
     icon: BarChart3,
-    gradient: 'bg-gradient-blue',
+    gradient: 'bg-[var(--dashboard-accent-primary)]/20',
+    iconColor: 'text-[var(--dashboard-accent-primary)]',
     description: 'Monitors financial market data',
   },
   {
     name: 'Decision Maker',
     icon: Brain,
-    gradient: 'bg-gradient-yellow',
+    gradient: 'bg-[var(--dashboard-accent-secondary)]/20',
+    iconColor: 'text-[var(--dashboard-accent-secondary)]',
     description: 'Analyzes data and makes decisions',
   },
   {
     name: 'Executor',
     icon: Zap,
-    gradient: 'bg-gradient-green',
+    gradient: 'bg-[var(--dashboard-accent-primary)]/20',
+    iconColor: 'text-[var(--dashboard-accent-primary)]',
     description: 'Executes trades and records actions',
   },
 ];
@@ -95,7 +98,7 @@ export function LiveAgentStatusCard({ agent, index }: LiveAgentStatusCardProps) 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={cn('h-10 w-10 rounded-full flex items-center justify-center', config.gradient)}>
-              <Icon className="h-5 w-5 text-white" />
+              <Icon className={cn('h-5 w-5', config.iconColor)} />
             </div>
             <div>
               <CardTitle className="text-base">{config.name}</CardTitle>
@@ -105,10 +108,10 @@ export function LiveAgentStatusCard({ agent, index }: LiveAgentStatusCardProps) 
           <Badge
             variant={isOnline ? 'default' : 'secondary'}
             className={cn(
-              isOnline && 'bg-green-500/20 text-green-400 border-green-500/50'
+              isOnline ? 'bg-white/10 text-white/70 border-white/20' : 'bg-white/5 text-white/50 border-white/10'
             )}
           >
-            <div className={cn('h-2 w-2 rounded-full mr-1.5', isOnline ? 'bg-green-400' : 'bg-gray-400')} />
+            <div className={cn('h-2 w-2 rounded-full mr-1.5', isOnline ? 'bg-white/70' : 'bg-white/30')} />
             {isOnline ? 'Online' : 'Idle'}
           </Badge>
         </div>
@@ -149,7 +152,7 @@ export function LiveAgentStatusCard({ agent, index }: LiveAgentStatusCardProps) 
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Last trade</span>
-              <span className="font-medium text-green-400">BTC +2.5%</span>
+              <span className="font-medium text-[var(--dashboard-profit)]">BTC +2.5%</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Time ago</span>
@@ -173,7 +176,7 @@ export function LiveAgentStatusCard({ agent, index }: LiveAgentStatusCardProps) 
             <Button
               size="sm"
               variant={isOnline ? "secondary" : "default"}
-              className="flex-1"
+              className="flex-1 text-white dark:text-white text-black dark:bg-[var(--dashboard-accent-primary)] bg-[var(--dashboard-accent-primary)] hover:opacity-90"
               disabled={isControlling}
               onClick={() => handleControl(isOnline ? 'stop' : 'start')}
             >
@@ -201,7 +204,7 @@ export function LiveAgentStatusCards({ agents }: LiveAgentStatusCardsProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Live Agent Status</h3>
+        <h3 className="text-lg font-semibold mb-4 text-white dark:text-white text-black">Live Agent Status</h3>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {agents.map((agent, index) => (
