@@ -186,3 +186,5 @@ export default function MarketDataPage() {
     </div>
   );
 }
+
+

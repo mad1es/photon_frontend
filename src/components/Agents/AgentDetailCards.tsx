@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, Brain, Zap } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Activity, Brain, Zap, TrendingUp, TrendingDown, Minus, Zap as ZapIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Agent } from '@/types/trading';
 import Link from 'next/link';
@@ -55,6 +56,28 @@ function AgentDetailCard({ agent }: AgentDetailCardProps) {
     }
   };
 
+  const getDecisionIcon = (action: string) => {
+    switch (action) {
+      case 'BUY':
+        return TrendingUp;
+      case 'SELL':
+        return TrendingDown;
+      default:
+        return Minus;
+    }
+  };
+
+  const getDecisionColor = (action: string) => {
+    switch (action) {
+      case 'BUY':
+        return 'text-green-500';
+      case 'SELL':
+        return 'text-red-500';
+      default:
+        return 'text-yellow-500';
+    }
+  };
+
   return (
     <Card className="card-glass hover-lift relative border-l-2 border-l-primary/50">
       <CardHeader>
@@ -78,6 +101,102 @@ function AgentDetailCard({ agent }: AgentDetailCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Exploration Mode Alert для Decision Maker */}
+        {agent.type === 'decision' && (agent as any).explorationMode?.enabled && (
+          <Alert className="border-blue-500/50 bg-blue-500/10 p-3">
+            <ZapIcon className="h-4 w-4 text-blue-500" />
+            <AlertDescription className="text-xs">
+              <span className="font-semibold text-blue-400">Exploration Mode</span>
+              <br />
+              {(agent as any).explorationMode.reason}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Последние решения для Decision Maker */}
+        {agent.type === 'decision' && (agent as any).recentDecisions && (agent as any).recentDecisions.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Recent Decisions</p>
+            <div className="space-y-1.5">
+              {(agent as any).recentDecisions.slice(0, 3).map((decision: any, idx: number) => {
+                const DecisionIcon = getDecisionIcon(decision.action);
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 p-2 rounded bg-muted/20 border border-border/50"
+                  >
+                    <DecisionIcon className={cn('h-4 w-4', getDecisionColor(decision.action))} />
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold">
+                        {decision.action} {decision.symbol}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        Confidence: {decision.confidence.toFixed(1)}%
+                      </p>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        'text-[10px]',
+                        decision.action === 'BUY'
+                          ? 'bg-green-500/20 text-green-400 border-green-500/50'
+                          : decision.action === 'SELL'
+                            ? 'bg-red-500/20 text-red-400 border-red-500/50'
+                            : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50'
+                      )}
+                    >
+                      {decision.action}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Current State Info */}
+        {(agent as any).currentState && (
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Status</p>
+            {agent.type === 'decision' && (
+              <>
+                {(agent as any).currentState.modelType && (
+                  <p className="text-xs text-foreground/80">
+                    Model: {(agent as any).currentState.modelType}
+                  </p>
+                )}
+                {(agent as any).currentState.completedTrades !== undefined && (
+                  <p className="text-xs text-foreground/80">
+                    Completed Trades: {(agent as any).currentState.completedTrades}
+                    {(agent as any).currentState.needsMoreData && (
+                      <span className="text-yellow-500"> (needs more data)</span>
+                    )}
+                  </p>
+                )}
+              </>
+            )}
+            {agent.type === 'execution' && (agent as any).currentState.totalTrades !== undefined && (
+              <p className="text-xs text-foreground/80">
+                Total Trades: {(agent as any).currentState.totalTrades}
+              </p>
+            )}
+            {agent.type === 'market' && (
+              <>
+                {(agent as any).currentState.symbol && (
+                  <p className="text-xs text-foreground/80">
+                    Symbol: {(agent as any).currentState.symbol}
+                  </p>
+                )}
+                {(agent as any).currentState.timeframe && (
+                  <p className="text-xs text-foreground/80">
+                    Timeframe: {(agent as any).currentState.timeframe}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Messages Processed</p>
           <p className="text-2xl font-bold tracking-tight">{agent.messagesProcessed}</p>
@@ -104,13 +223,13 @@ function AgentDetailCard({ agent }: AgentDetailCardProps) {
                 [{new Date(log.timestamp).toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
-                })}] {log.message}
+                })}] {log.message.substring(0, 60)}{log.message.length > 60 && '...'}
               </div>
             ))}
           </div>
         </div>
         <Button variant="outline" className="w-full border-border/50 hover:bg-primary/10" asChild>
-          <Link href="/agents">View Logs</Link>
+          <Link href="/agents">View Details</Link>
         </Button>
       </CardContent>
     </Card>
@@ -130,4 +249,3 @@ export function AgentDetailCards({ agents }: AgentDetailCardsProps) {
     </div>
   );
 }
-

@@ -142,3 +142,5 @@ export function useMarketDataById(id: number) {
 
   return { data, loading, error, refetch: fetchData };
 }
+
+
