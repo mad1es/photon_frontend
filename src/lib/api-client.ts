@@ -638,7 +638,17 @@ class ApiClient {
   }
 
   async getLatestMarketData() {
-    return await this.request<Array<{
+    return await this.request<{
+      data: Array<{
+        symbol: string;
+        price: number;
+        change: number;
+        change_percent: number;
+        volume: number;
+        timestamp: string;
+      }>;
+      errors?: string[];
+    } | Array<{
       symbol: string;
       price: number;
       change: number;

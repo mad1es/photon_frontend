@@ -77,14 +77,17 @@ export function useLatestMarketData() {
     try {
       setLoading(true);
       setError(null);
-      const latestData = await apiClient.getLatestMarketData();
+      const response = await apiClient.getLatestMarketData();
 
-      const formattedData: LatestMarketDataItem[] = (latestData || []).map((item) => ({
+      // API возвращает объект с полем data или массив напрямую
+      const latestData = Array.isArray(response) ? response : (response as any)?.data || [];
+
+      const formattedData: LatestMarketDataItem[] = (latestData || []).map((item: any) => ({
         symbol: item.symbol,
         price: item.price,
-        change: item.change,
-        changePercent: item.change_percent,
-        volume: item.volume,
+        change: item.change || 0,
+        changePercent: item.change_percent || item.changePercent || 0,
+        volume: item.volume || 0,
         timestamp: new Date(item.timestamp),
       }));
 

@@ -49,14 +49,12 @@ export function MarketInfoCard({ symbol = 'btcusdt' }: MarketInfoCardProps) {
 
   if (!data) {
     return (
-      <Card className="dashboard-card">
-        <CardHeader>
+      <Card className="dashboard-card flex flex-col h-full max-h-[400px]">
+        <CardHeader className="flex-shrink-0">
           <CardTitle className="text-white">Market Info</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-32">
-            <p className="text-white/50">Loading market data...</p>
-          </div>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <p className="text-white/50">Loading market data...</p>
         </CardContent>
       </Card>
     );
@@ -69,11 +67,11 @@ export function MarketInfoCard({ symbol = 'btcusdt' }: MarketInfoCardProps) {
   };
 
   return (
-    <Card className="dashboard-card">
-      <CardHeader>
+    <Card className="dashboard-card flex flex-col h-full max-h-[400px]">
+      <CardHeader className="flex-shrink-0">
         <CardTitle className="text-white">Market: {formatSymbol(symbol)}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex-1 overflow-y-auto space-y-4">
         <div>
           <p className="text-sm text-white/50 mb-1">Last Price</p>
           <div className="flex items-center gap-2">

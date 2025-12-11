@@ -18,6 +18,7 @@ export function useOrderbookWS(symbol: string = 'btcusdt', depth: number = 20) {
   const [data, setData] = useState<OrderBookData | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
@@ -25,6 +26,7 @@ export function useOrderbookWS(symbol: string = 'btcusdt', depth: number = 20) {
   const orderBookRef = useRef<OrderBookData | null>(null);
   const symbolRef = useRef(symbol);
   const isMountedRef = useRef(true);
+  const snapshotRef = useRef<number | null>(null);
 
   useEffect(() => {
     symbolRef.current = symbol;
@@ -33,75 +35,144 @@ export function useOrderbookWS(symbol: string = 'btcusdt', depth: number = 20) {
     };
   }, [symbol]);
 
+  const fetchSnapshot = useCallback(async (currentSymbol: string) => {
+    try {
+      setIsLoading(true);
+      const symbolUpper = currentSymbol.toUpperCase();
+      const response = await fetch(
+        `https://api.binance.com/api/v3/depth?symbol=${symbolUpper}&limit=${depth}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch order book snapshot');
+      }
+
+      const snapshot = await response.json();
+      
+      if (symbolRef.current !== currentSymbol || !isMountedRef.current) {
+        return;
+      }
+
+      const bids: OrderBookEntry[] = (snapshot.bids || []).map((bid: [string, string]) => ({
+        price: parseFloat(bid[0]),
+        quantity: parseFloat(bid[1]),
+        total: 0,
+      })).sort((a: OrderBookEntry, b: OrderBookEntry) => b.price - a.price);
+
+      const asks: OrderBookEntry[] = (snapshot.asks || []).map((ask: [string, string]) => ({
+        price: parseFloat(ask[0]),
+        quantity: parseFloat(ask[1]),
+        total: 0,
+      })).sort((a: OrderBookEntry, b: OrderBookEntry) => a.price - b.price);
+
+      let bidTotal = 0;
+      const bidsWithTotal = bids.slice(0, depth).map((bid) => {
+        bidTotal += bid.quantity;
+        return { ...bid, total: bidTotal };
+      });
+
+      let askTotal = 0;
+      const asksWithTotal = asks.slice(0, depth).map((ask) => {
+        askTotal += ask.quantity;
+        return { ...ask, total: askTotal };
+      });
+
+      const initial = {
+        bids: bidsWithTotal,
+        asks: asksWithTotal,
+        lastUpdateId: snapshot.lastUpdateId,
+      };
+
+      orderBookRef.current = initial;
+      snapshotRef.current = snapshot.lastUpdateId;
+      setData(initial);
+      setIsLoading(false);
+    } catch (err) {
+      if (symbolRef.current === currentSymbol && isMountedRef.current) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch snapshot');
+        setIsLoading(false);
+      }
+    }
+  }, [depth]);
+
   const processOrderBookUpdate = useCallback((update: any) => {
-    if (!orderBookRef.current) return;
+    if (!orderBookRef.current || !snapshotRef.current) return;
 
-    const newBids = [...orderBookRef.current.bids];
-    const newAsks = [...orderBookRef.current.asks];
-
-    if (update.b && Array.isArray(update.b)) {
-      update.b.forEach((bid: [string, string]) => {
-        const price = parseFloat(bid[0]);
-        const quantity = parseFloat(bid[1]);
-        const index = newBids.findIndex((b) => Math.abs(b.price - price) < 0.01);
-        
-        if (quantity === 0) {
-          if (index !== -1) {
-            newBids.splice(index, 1);
-          }
-        } else {
-          if (index !== -1) {
-            newBids[index] = { price, quantity, total: 0 };
-          } else {
-            newBids.push({ price, quantity, total: 0 });
-          }
-        }
-      });
+    // Ignore updates older than snapshot
+    if (update.u <= snapshotRef.current) {
+      return;
     }
 
-    if (update.a && Array.isArray(update.a)) {
-      update.a.forEach((ask: [string, string]) => {
-        const price = parseFloat(ask[0]);
-        const quantity = parseFloat(ask[1]);
-        const index = newAsks.findIndex((a) => Math.abs(a.price - price) < 0.01);
-        
-        if (quantity === 0) {
-          if (index !== -1) {
-            newAsks.splice(index, 1);
-          }
-        } else {
-          if (index !== -1) {
-            newAsks[index] = { price, quantity, total: 0 };
+    // Apply update if it's newer than snapshot
+    // update.U is first update ID, update.u is last update ID
+    if (update.u > snapshotRef.current) {
+      const newBids = [...orderBookRef.current.bids];
+      const newAsks = [...orderBookRef.current.asks];
+
+      if (update.b && Array.isArray(update.b)) {
+        update.b.forEach((bid: [string, string]) => {
+          const price = parseFloat(bid[0]);
+          const quantity = parseFloat(bid[1]);
+          const index = newBids.findIndex((b) => Math.abs(b.price - price) < 0.00001);
+          
+          if (quantity === 0) {
+            if (index !== -1) {
+              newBids.splice(index, 1);
+            }
           } else {
-            newAsks.push({ price, quantity, total: 0 });
+            if (index !== -1) {
+              newBids[index] = { price, quantity, total: 0 };
+            } else {
+              newBids.push({ price, quantity, total: 0 });
+            }
           }
-        }
+        });
+      }
+
+      if (update.a && Array.isArray(update.a)) {
+        update.a.forEach((ask: [string, string]) => {
+          const price = parseFloat(ask[0]);
+          const quantity = parseFloat(ask[1]);
+          const index = newAsks.findIndex((a) => Math.abs(a.price - price) < 0.00001);
+          
+          if (quantity === 0) {
+            if (index !== -1) {
+              newAsks.splice(index, 1);
+            }
+          } else {
+            if (index !== -1) {
+              newAsks[index] = { price, quantity, total: 0 };
+            } else {
+              newAsks.push({ price, quantity, total: 0 });
+            }
+          }
+        });
+      }
+
+      newBids.sort((a, b) => b.price - a.price);
+      newAsks.sort((a, b) => a.price - b.price);
+
+      let bidTotal = 0;
+      const bidsWithTotal = newBids.slice(0, depth).map((bid) => {
+        bidTotal += bid.quantity;
+        return { ...bid, total: bidTotal };
       });
+
+      let askTotal = 0;
+      const asksWithTotal = newAsks.slice(0, depth).map((ask) => {
+        askTotal += ask.quantity;
+        return { ...ask, total: askTotal };
+      });
+
+      const updated = {
+        bids: bidsWithTotal,
+        asks: asksWithTotal,
+        lastUpdateId: update.u || orderBookRef.current.lastUpdateId,
+      };
+
+      orderBookRef.current = updated;
+      setData(updated);
     }
-
-    newBids.sort((a, b) => b.price - a.price);
-    newAsks.sort((a, b) => a.price - b.price);
-
-    let bidTotal = 0;
-    const bidsWithTotal = newBids.slice(0, depth).map((bid) => {
-      bidTotal += bid.quantity;
-      return { ...bid, total: bidTotal };
-    });
-
-    let askTotal = 0;
-    const asksWithTotal = newAsks.slice(0, depth).map((ask) => {
-      askTotal += ask.quantity;
-      return { ...ask, total: askTotal };
-    });
-
-    const updated = {
-      bids: bidsWithTotal,
-      asks: asksWithTotal,
-      lastUpdateId: update.u || orderBookRef.current.lastUpdateId,
-    };
-
-    orderBookRef.current = updated;
-    setData(updated);
   }, [depth]);
 
   const connect = useCallback(() => {
@@ -138,42 +209,7 @@ export function useOrderbookWS(symbol: string = 'btcusdt', depth: number = 20) {
           const message = JSON.parse(event.data);
           
           if (message.e === 'depthUpdate' && symbolRef.current === currentSymbol) {
-            if (!orderBookRef.current) {
-              const bids: OrderBookEntry[] = (message.b || []).map((bid: [string, string]) => ({
-                price: parseFloat(bid[0]),
-                quantity: parseFloat(bid[1]),
-                total: 0,
-              })).sort((a: OrderBookEntry, b: OrderBookEntry) => b.price - a.price);
-              
-              const asks: OrderBookEntry[] = (message.a || []).map((ask: [string, string]) => ({
-                price: parseFloat(ask[0]),
-                quantity: parseFloat(ask[1]),
-                total: 0,
-              })).sort((a: OrderBookEntry, b: OrderBookEntry) => a.price - b.price);
-
-              let bidTotal = 0;
-              const bidsWithTotal = bids.slice(0, depth).map((bid) => {
-                bidTotal += bid.quantity;
-                return { ...bid, total: bidTotal };
-              });
-
-              let askTotal = 0;
-              const asksWithTotal = asks.slice(0, depth).map((ask) => {
-                askTotal += ask.quantity;
-                return { ...ask, total: askTotal };
-              });
-
-              const initial = {
-                bids: bidsWithTotal,
-                asks: asksWithTotal,
-                lastUpdateId: message.u,
-              };
-
-              orderBookRef.current = initial;
-              setData(initial);
-            } else {
-              processOrderBookUpdate(message);
-            }
+            processOrderBookUpdate(message);
           }
         } catch (err) {
           console.error('Error parsing orderbook message:', err);
@@ -215,13 +251,15 @@ export function useOrderbookWS(symbol: string = 'btcusdt', depth: number = 20) {
         setIsConnected(false);
       }
     }
-  }, [depth, processOrderBookUpdate]);
+  }, [processOrderBookUpdate]);
 
   useEffect(() => {
     setData(null);
     setIsConnected(false);
     setError(null);
+    setIsLoading(true);
     orderBookRef.current = null;
+    snapshotRef.current = null;
     reconnectAttempts.current = 0;
     
     if (reconnectTimeoutRef.current) {
@@ -233,7 +271,17 @@ export function useOrderbookWS(symbol: string = 'btcusdt', depth: number = 20) {
       wsRef.current = null;
     }
 
-    connect();
+    // First fetch snapshot, then connect WebSocket
+    (async () => {
+      try {
+        await fetchSnapshot(symbol);
+        if (symbolRef.current === symbol && isMountedRef.current && orderBookRef.current) {
+          connect();
+        }
+      } catch (err) {
+        console.error('Failed to initialize order book:', err);
+      }
+    })();
 
     return () => {
       if (reconnectTimeoutRef.current) {
@@ -244,8 +292,10 @@ export function useOrderbookWS(symbol: string = 'btcusdt', depth: number = 20) {
         wsRef.current = null;
       }
       orderBookRef.current = null;
+      snapshotRef.current = null;
     };
-  }, [symbol, connect]);
+  }, [symbol, fetchSnapshot, connect]);
 
-  return { data, isConnected, error };
+  return { data, isConnected, error, isLoading };
 }
+
