@@ -199,9 +199,9 @@ export function MetaModelBacktest({ onComplete }: MetaModelBacktestProps) {
                     <CardTitle className="text-sm">Market Regime Distribution</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {Object.entries(result.regime_distribution).map(([regime, count]: [string, any]) => {
-                      const total = Object.values(result.regime_distribution).reduce((a: number, b: any) => a + b, 0);
-                      const percentage = total > 0 ? (count / total * 100).toFixed(1) : 0;
+                    {Object.entries(result.regime_distribution).map(([regime, count]: [string, number]) => {
+                      const total = (Object.values(result.regime_distribution) as number[]).reduce((a: number, b: number) => a + b, 0);
+                      const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
                       return (
                         <div key={regime} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
