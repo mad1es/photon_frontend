@@ -29,6 +29,7 @@ export function DynamicLayoutProviders({
       attribute="class"
       defaultTheme="dark"
       enableSystem={false}
+      storageKey="theme"
       disableTransitionOnChange
     >
       {children}

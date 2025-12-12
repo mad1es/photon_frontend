@@ -64,8 +64,25 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${roboto_mono.variable}`} suppressHydrationWarning>
-      <head />
+    <html lang="en" className={`${inter.variable} ${roboto_mono.variable} dark`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme');
+                  if (!theme || theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased bg-background text-foreground">
         <DynamicLayoutProviders>
           <div className="flex pt-2 flex-col min-h-screen bg-background">
