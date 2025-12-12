@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { apiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { MetaModelTrade } from './MetaModelTrade';
+import { MetaModelBacktest } from './MetaModelBacktest';
 
 interface TradeTicketProps {
   onExecuted?: () => void;
@@ -43,9 +44,10 @@ export function TradeTicket({ onExecuted }: TradeTicketProps) {
 
   return (
     <Tabs defaultValue="manual" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="manual">Manual Trade</TabsTrigger>
         <TabsTrigger value="meta-model">AI Meta-Model</TabsTrigger>
+        <TabsTrigger value="backtest">Backtest</TabsTrigger>
       </TabsList>
       <TabsContent value="manual">
         <Card className="card-glass hover-lift">
@@ -100,6 +102,9 @@ export function TradeTicket({ onExecuted }: TradeTicketProps) {
       </TabsContent>
       <TabsContent value="meta-model">
         <MetaModelTrade onExecuted={onExecuted} />
+      </TabsContent>
+      <TabsContent value="backtest">
+        <MetaModelBacktest onComplete={onExecuted} />
       </TabsContent>
     </Tabs>
   );

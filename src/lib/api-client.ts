@@ -766,6 +766,53 @@ class ApiClient {
       total_blacklisted: number;
     }>('/trading/meta-model/approved-assets/');
   }
+
+  async runMetaModelBacktest(params: {
+    symbol: string;
+    initial_balance?: number;
+    train_window?: number;
+    retrain_interval?: number;
+    use_ensemble?: boolean;
+    use_regime_switching?: boolean;
+  }) {
+    return await this.request<{
+      success: boolean;
+      symbol: string;
+      initial_balance: number;
+      final_balance: number;
+      total_return: number;
+      total_trades: number;
+      profitable_trades: number;
+      losing_trades: number;
+      win_rate: number;
+      regime_distribution: {
+        flat: number;
+        volatile: number;
+        trend: number;
+      };
+      trades: Array<{
+        index: number;
+        action: 'BUY' | 'SELL';
+        price: number;
+        confidence: number;
+        regime: string;
+        pnl?: number;
+        pnl_pct?: number;
+        is_closing?: boolean;
+      }>;
+      models_used: string[];
+      models_count: number;
+      settings: {
+        train_window: number;
+        retrain_interval: number;
+        use_ensemble: boolean;
+        use_regime_switching: boolean;
+      };
+    }>('/trading/meta-model/backtest/', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();
