@@ -40,7 +40,9 @@ export function MetaModelBacktest({ onComplete }: MetaModelBacktestProps) {
         onComplete();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Backtest failed');
+      console.error('Backtest error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Backtest failed';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
