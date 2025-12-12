@@ -5,6 +5,7 @@ import { MessageTimeline } from '@/components/Agents/MessageTimeline';
 import { CommunicationFlow } from '@/components/Agents/CommunicationFlow';
 import { AgentWorkflowVisualization } from '@/components/Agents/AgentWorkflowVisualization';
 import { DecisionExplainer } from '@/components/Agents/DecisionExplainer';
+import { MetaModelTrade } from '@/components/Portfolio/MetaModelTrade';
 import { useAgents, useMessages } from '@/hooks/use-agents';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -61,6 +62,9 @@ export default function AgentsPage() {
 
       {/* Agent Workflow Visualization */}
       <AgentWorkflowVisualization agents={agents} />
+
+      {/* Meta-Model Trading */}
+      <MetaModelTrade />
 
       {/* Agent Details Cards */}
       <AgentDetailCards agents={agents} />

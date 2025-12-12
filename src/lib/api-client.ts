@@ -667,6 +667,105 @@ class ApiClient {
       method: 'POST',
     });
   }
+
+  // Meta-Model endpoints
+  async runMetaModelTrade(params: {
+    symbol: string;
+    execute?: boolean;
+  }) {
+    return await this.request<{
+      success: boolean;
+      symbol: string;
+      decision: {
+        action: 'BUY' | 'SELL' | 'HOLD';
+        confidence: number;
+        regime: 'trend' | 'flat' | 'volatile';
+        price: number;
+        decision_id: number;
+      };
+      market_data: {
+        timestamp: string;
+        close: number;
+        volume: number;
+      };
+      execution?: {
+        status: string;
+        action: string;
+        quantity: number;
+        price: number;
+        trade_id: number;
+        position_id: number;
+      };
+    }>('/trading/meta-model/trade/', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
+
+  async getTradingChartData(symbol: string, days: number = 30) {
+    const params = new URLSearchParams();
+    params.append('symbol', symbol);
+    params.append('days', days.toString());
+    return await this.request<{
+      symbol: string;
+      candles: Array<{
+        timestamp: string;
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+        volume: number;
+      }>;
+      trades: Array<{
+        timestamp: string;
+        side: 'BUY' | 'SELL';
+        price: number;
+        quantity: number;
+        trade_id: number;
+        decision_id: number | null;
+        confidence: number | null;
+      }>;
+      decisions: Array<{
+        timestamp: string;
+        action: 'BUY' | 'SELL' | 'HOLD';
+        confidence: number;
+        decision_id: number;
+        regime: string | null;
+      }>;
+      summary: {
+        total_trades: number;
+        buy_trades: number;
+        sell_trades: number;
+        total_decisions: number;
+      };
+    }>(`/trading/meta-model/chart-data/?${params.toString()}`);
+  }
+
+  async getApprovedAssets() {
+    return await this.request<{
+      approved: Array<{
+        symbol: string;
+        category: string;
+        historical_score: number;
+        win_rate: number | null;
+        trades: number | null;
+        config: {
+          enabled: boolean;
+          max_position_size: number;
+          min_confidence: number;
+          use_meta_model: boolean;
+          risk_level: string;
+        };
+      }>;
+      blacklisted: Array<{
+        symbol: string;
+        reason: string;
+        score: number | null;
+      }>;
+      total_approved: number;
+      total_blacklisted: number;
+    }>('/trading/meta-model/approved-assets/');
+  }
 }
 
 export const apiClient = new ApiClient();
